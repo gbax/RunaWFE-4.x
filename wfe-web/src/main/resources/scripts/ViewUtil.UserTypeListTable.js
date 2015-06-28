@@ -206,7 +206,7 @@ $(document).ready(function() {
 						var jsonObjValues = [];
 						jsonObjValues[0] = null;
 						var jsonObj = data.inputArray[i];
-						console.debug("getSelectCallback.callback: i: %s jsonObj: %s", i, JSON.stringify(jsonObj));
+						console.log("getSelectCallback.callback: i: %s jsonObj: %s", i, JSON.stringify(jsonObj));
 						for (var key in jsonObj) {
 							jsonObjValues.push(jsonObj[key]);
 						}
@@ -220,14 +220,14 @@ $(document).ready(function() {
 							for (var k = 1; k < cells.length; k++) {
 								var cellvalue = $(cells[k]).html();
 								var jsonvalue = jsonObjValues[k];
-								console.debug("getSelectCallback.callback: i: %s j: %s k: %s cellvalue: %s value: %s", i, j, k, cellvalue, jsonvalue);
+								console.log("getSelectCallback.callback: i: %s j: %s k: %s cellvalue: %s value: %s", i, j, k, cellvalue, jsonvalue);
 								if (compareStringsByWords(cellvalue, jsonvalue)) {
 									continue;
 								}
 								match = false;
 								break;
 							}
-							console.debug("getSelectCallback.callback: i: %s j: %s match: %s checked: %s", i, j, match, row.find(":checkbox").first().prop("checked"));
+							console.log("getSelectCallback.callback: i: %s j: %s match: %s checked: %s", i, j, match, row.find(":checkbox").first().prop("checked"));
 							if (match && row.find(":checkbox").first().prop("checked")) {
 								selectedArray.push(jsonObj);
 							}
