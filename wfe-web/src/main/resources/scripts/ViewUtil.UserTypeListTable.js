@@ -218,10 +218,10 @@ $(document).ready(function() {
 								match = false;
 							}
 							for (var k = 1; k < cells.length; k++) {
-								var cellvalue = $(cells[k]).html().replace(/<BR>/g, "<br>");
+								var cellvalue = $(cells[k]).html();
 								var jsonvalue = jsonObjValues[k];
 								console.debug("getSelectCallback.callback: i: %s j: %s k: %s cellvalue: %s value: %s", i, j, k, cellvalue, jsonvalue);
-								if (cellvalue == jsonvalue) {
+								if (compareStringsByWords(cellvalue, jsonvalue)) {
 									continue;
 								}
 								match = false;
@@ -340,6 +340,23 @@ $(document).ready(function() {
 	function applyCheboxStyle(table) {
 		table.find(":checkbox").css("margin","3px 3px 3px 4px");
 		table.find(":checkbox").css("width","30px");
+	};
+	
+	function compareStringsByWords(s1, s2) {
+		var a1 = s1.split(/[\s+<br>\s+]+|\s+/ig);
+		var a2 = s2.split(/[\s+<br>\s+]+|\s+/ig);
+		if (a1.length != a2.length) {
+			return false;
+		}
+		var result = true;
+		for (var i = 0, len = a1.length; i < len; i++) {
+			if (a1[i] == a2[i]) {
+				continue;
+			}
+			result = false;
+			break;
+		}
+		return result;
 	};
 
 })(jQuery);
