@@ -28,7 +28,7 @@ public abstract class TextCompareChange extends TextEditBasedChange {
     @Override
     public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
         if (adapter == TextEditChangeNode.class) {
-            return new GPDChangeNode(this, object);
+            return new ChangeNode(this, object);
         }
         return super.getAdapter(adapter);
     }

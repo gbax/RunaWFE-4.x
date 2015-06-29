@@ -53,17 +53,14 @@ public class MoveUserTypeAttributeRefactoring extends Refactoring {
         RefactoringStatus status = new RefactoringStatus();
         List<Variable> result = VariableUtils.findVariablesOfTypeWithAttributeExpanded(processDefinition, oldType, attribute);
         for (Variable variable : result) {
-            String rootName = variable.getName().substring(0, variable.getName().indexOf(VariableUserType.DELIM));
-            String rootScriptingName = variable.getScriptingName().substring(0, variable.getScriptingName().indexOf(VariableUserType.DELIM));
             String newName;
             String newScriptingName;
             if (substitutionVariable != null) {
-                newName = variable.getName().replace(rootName + VariableUserType.DELIM, substitutionVariable.getName() + VariableUserType.DELIM);
-                newScriptingName = variable.getScriptingName().replace(rootScriptingName + VariableUserType.DELIM,
-                        substitutionVariable.getScriptingName() + VariableUserType.DELIM);
+                newName = substitutionVariable.getName() + VariableUserType.DELIM + attribute.getName();
+                newScriptingName = substitutionVariable.getScriptingName() + VariableUserType.DELIM + attribute.getScriptingName();
             } else {
-                newName = variable.getName().replace(rootName + VariableUserType.DELIM, "");
-                newScriptingName = variable.getScriptingName().replace(rootScriptingName + VariableUserType.DELIM, "");
+                newName = attribute.getName();
+                newScriptingName = attribute.getScriptingName();
             }
             RenameVariableRefactoring refactoring = new RenameVariableRefactoring(definitionFile, processDefinition, variable, newName,
                     newScriptingName);
