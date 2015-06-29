@@ -49,8 +49,8 @@ public class RenameRefactoringWizard extends RefactoringWizard {
             if (object instanceof CompositeChangeNode) {
                 return SharedImages.getImage(((CompositeChangeNode) object).getImageDescriptor());
             }
-            if (object instanceof GPDChangeNode) {
-                GPDChangeNode node = (GPDChangeNode) object;
+            if (object instanceof ChangeNode) {
+                ChangeNode node = (ChangeNode) object;
                 return node.getImage();
             }
             return SharedImages.getImage("icons/file_change.gif");
