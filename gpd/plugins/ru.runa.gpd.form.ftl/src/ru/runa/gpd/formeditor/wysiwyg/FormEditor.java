@@ -70,6 +70,7 @@ import ru.runa.gpd.htmleditor.editors.HTMLSourceEditor;
 import ru.runa.gpd.lang.model.FormNode;
 import ru.runa.gpd.lang.model.ProcessDefinition;
 import ru.runa.gpd.lang.model.Variable;
+import ru.runa.gpd.lang.model.VariableUserType;
 import ru.runa.gpd.lang.par.ParContentProvider;
 import ru.runa.gpd.ui.view.SelectionProvider;
 import ru.runa.gpd.util.EditorUtils;
@@ -85,8 +86,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
- * The WYSIWYG HTML editor using <a
- * href="http://www.fckeditor.net/">FCKeditor</a>.
+ * The WYSIWYG HTML editor using <a href="http://www.fckeditor.net/">FCKeditor</a>.
  * <p>
  * org.eclipse.ui.texteditor.BasicTextEditorActionContributor
  * </p>
@@ -184,6 +184,17 @@ public class FormEditor extends MultiPageEditorPart implements IResourceChangeLi
         List<String> list = Lists.newArrayList(getVariables(typeClassNameFilter).keySet());
         Collections.sort(list);
         return list;
+    }
+
+    public List<VariableUserType> getUserVariablesTypes() {
+        return formNode.getProcessDefinition().getVariableUserTypes();
+    }
+
+    public ProcessDefinition getProcessDefinition() {
+        if (formNode == null) {
+            return null;
+        }
+        return formNode.getProcessDefinition();
     }
 
     public synchronized Map<String, Variable> getVariables(String typeClassNameFilter) {
@@ -503,6 +514,17 @@ public class FormEditor extends MultiPageEditorPart implements IResourceChangeLi
         });
         components.put(component.getId(), component);
         return component;
+    }
+
+    public Component getSelectedComponent() {
+        if (selectionProvider.getSelection().isEmpty()) {
+            return null;
+        }
+        Object result = ((StructuredSelection) selectionProvider.getSelection()).getFirstElement();
+        if (!(result instanceof Component)) {
+            return null;
+        }
+        return (Component) result;
     }
 
     public Component getComponentNotNull(int componentId) {
