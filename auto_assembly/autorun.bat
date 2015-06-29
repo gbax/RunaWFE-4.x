@@ -41,6 +41,8 @@ call mvn clean package -Djboss.zip.file=../../../../jboss7.zip -Djboss.zip.folde
 xcopy /E /Q target\test-result ..\..\..\..\..\results\test-result\
 mkdir ..\..\..\..\..\results\Execution
 copy target\artifacts\Installer\RunaWFE-Installer.exe ..\..\..\..\..\results\Execution\
+mkdir ..\..\..\..\..\results\Execution64
+copy target\artifacts\Installer64\RunaWFE-Installer.exe ..\..\..\..\..\results\Execution64\
 mkdir ..\..\..\..\..\results\ISO
 copy target\installer.iso ..\..\..\..\..\results\ISO\
 copy target\installer64.iso ..\..\..\..\..\results\ISO\
