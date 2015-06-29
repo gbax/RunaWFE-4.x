@@ -40,7 +40,10 @@ public class StringFormat extends VariableFormat implements VariableDisplaySuppo
 
     @Override
     protected String convertFromStringValue(String source) {
-        return source;
+        /*
+         * internal java-string without html-formatting tags
+         */
+        return source.replaceAll("<br>", "\n");
     }
 
     @Override
