@@ -42,7 +42,12 @@ import com.google.common.collect.Sets;
  * @since 4.0
  */
 public class TaskListBuilder implements ITaskListBuilder {
+
+    protected static final int CAN_I_SUBSTITUTE = 1;
+    protected static final int SUBSTITUTION_APPLIES = 0x10;
+
     private static final Log log = LogFactory.getLog(TaskListBuilder.class);
+
     private final TaskCache taskCache = TaskCacheCtrl.getInstance();
     @Autowired
     private WfTaskFactory taskObjectFactory;
@@ -151,31 +156,43 @@ public class TaskListBuilder implements ITaskListBuilder {
             Substitution substitution = substitutionRule.getKey();
             SubstitutionCriteria criteria = substitution.getCriteria();
             if (substitution instanceof TerminatorSubstitution) {
-                if (criteria == null || criteria.isSatisfied(executionContext, task, assignedActor, substitutorActor)) {
-                    log.debug(task + " is ignored due to acceptable terminator rule");
+                if (criteriaIsSatisfied(criteria, executionContext, task, assignedActor, substitutorActor)) {
+                    log.debug(String.format("isTaskAcceptableBySubstitutionRules: task: %s is ignored due to acceptable terminator rule", task));
                     return false;
                 }
                 continue;
             }
-            boolean canISubstitute = false;
-            boolean substitutionApplies = false;
-            for (Long actorId : substitutionRule.getValue()) {
-                Actor actor = executorDAO.getActor(actorId);
-                if (actor.isActive() && (criteria == null || criteria.isSatisfied(executionContext, task, assignedActor, actor))) {
-                    log.debug("To " + task + " is applied " + substitutionRule.getKey());
-                    substitutionApplies = true;
-                }
-                if (Objects.equal(actor, substitutorActor)) {
-                    canISubstitute = true;
-                }
-            }
-            if (!substitutionApplies) {
+            int substitutionRules = checkSubstitutionRules(criteria, substitutionRule.getValue(), executionContext, task, assignedActor,
+                    substitutorActor);
+            if ((substitutionRules & SUBSTITUTION_APPLIES) == 0) {
                 continue;
             }
-            return canISubstitute;
+            return (substitutionRules & CAN_I_SUBSTITUTE) != 0;
         }
-        log.debug(task + " is ignored due to no subsitution rule applies: " + mapOfSubstitionRule);
+        log.debug(String.format("isTaskAcceptableBySubstitutionRules:  task: %s is ignored due to no subsitution rule applies: %s", task,
+                mapOfSubstitionRule));
         return false;
+    }
+
+    protected int checkSubstitutionRules(SubstitutionCriteria criteria, Set<Long> ids, ExecutionContext executionContext, Task task,
+            Actor assignedActor, Actor substitutorActor) {
+        int result = 0;
+        for (Long actorId : ids) {
+            Actor actor = executorDAO.getActor(actorId);
+            if (actor.isActive() && criteriaIsSatisfied(criteria, executionContext, task, assignedActor, actor)) {
+                log.debug(String.format("checkSubstitutionCriteriaRules: to task: %s is applied %s", task, criteria));
+                result |= SUBSTITUTION_APPLIES;
+            }
+            if (Objects.equal(actor, substitutorActor)) {
+                result |= CAN_I_SUBSTITUTE;
+            }
+        }
+        return result;
+    }
+
+    protected boolean criteriaIsSatisfied(SubstitutionCriteria criteria, ExecutionContext executionContext, Task task, Actor asActor,
+            Actor substitutorActor) {
+        return (criteria == null || criteria.isSatisfied(executionContext, task, asActor, substitutorActor));
     }
 
     protected boolean hasActiveActorInGroup(Group group) {
