@@ -62,7 +62,7 @@ InstallJava:
   ${endif}
   ClearErrors
   StrCmp $JdkInstaller "" 0 ExtInstaller
-  File "/oname=$TEMP\jdk_setup.exe" jdk-7u17-windows-i586.exe
+  File "/oname=$TEMP\jdk_setup.exe" jdk_setup.exe
   ExecWait '"$TEMP\jdk_setup.exe"' $0
   Delete "$TEMP\jdk_setup.exe"
   goto InstallCompl
