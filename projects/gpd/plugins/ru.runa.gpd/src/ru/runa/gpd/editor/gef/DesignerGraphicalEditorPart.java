@@ -12,6 +12,9 @@ import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.GraphicalEditPart;
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.Request;
+import org.eclipse.gef.commands.CommandStack;
+import org.eclipse.gef.commands.CommandStackEvent;
+import org.eclipse.gef.commands.CommandStackEventListener;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.tools.MarqueeDragTracker;
 import org.eclipse.gef.tools.MarqueeSelectionTool;
@@ -24,6 +27,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPart;
@@ -37,7 +41,7 @@ import ru.runa.gpd.editor.StructuredSelectionProvider;
 import ru.runa.gpd.lang.model.GraphElement;
 
 @SuppressWarnings({ "unchecked", "restriction" })
-public class DesignerGraphicalEditorPart extends GraphicalEditorWithFlyoutPalette {
+public class DesignerGraphicalEditorPart extends GraphicalEditorWithFlyoutPalette implements CommandStackEventListener{
     private final ProcessEditorBase editor;
     private final DesignerPaletteRoot paletteRoot;
 
@@ -73,6 +77,7 @@ public class DesignerGraphicalEditorPart extends GraphicalEditorWithFlyoutPalett
     protected void configureGraphicalViewer() {
         super.configureGraphicalViewer();
         getEditDomain().addViewer(getGraphicalViewer());
+        getCommandStack().addCommandStackEventListener(this);
         getGraphicalViewer().setRootEditPart(new ScalableFreeformRootEditPart() {
             @Override
             public DragTracker getDragTracker(Request req) {
@@ -136,6 +141,12 @@ public class DesignerGraphicalEditorPart extends GraphicalEditorWithFlyoutPalett
     public void doSave(IProgressMonitor monitor) {
     }
 
+    @Override
+    public void dispose() {
+        getCommandStack().removeCommandStackEventListener(this);
+        super.dispose();
+    }
+
     private class EditorContextMenuProvider extends ContextMenuProvider {
         public EditorContextMenuProvider(EditPartViewer viewer) {
             super(viewer);
@@ -177,5 +188,15 @@ public class DesignerGraphicalEditorPart extends GraphicalEditorWithFlyoutPalett
     @Override
     protected FlyoutPreferences getPalettePreferences() {
         return new PaletteFlyoutPreferences();
+    }
+
+    @Override
+    public void stackChanged(CommandStackEvent event) {
+        if (Display.getCurrent() != null) {
+            switch (event.getDetail()) {
+            case CommandStack.POST_UNDO:
+                editor.refresh();
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 package ru.runa.gpd.editor.gef.part.graph;
 
 import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.draw2d.ConnectionAnchor;
@@ -60,6 +61,28 @@ public class NodeGraphicalEditPart extends ElementGraphicalEditPart implements N
     @Override
     protected List<Transition> getModelTargetConnections() {
         return getModel().getArrivingTransitions();
+    }
+
+    @Override
+    protected void primAddSourceConnection(ConnectionEditPart connection, int index) {
+        if (sourceConnections == null) {
+            sourceConnections = new ArrayList<ConnectionEditPart>();
+        }
+        if (sourceConnections.size() < index) {
+            return;
+        }
+        super.primAddSourceConnection(connection, index);
+    }
+
+    @Override
+    protected void primAddTargetConnection(ConnectionEditPart connection, int index) {
+        if (targetConnections == null) {
+            targetConnections = new ArrayList<ConnectionEditPart>();
+        }
+        if (targetConnections.size() < index) {
+            return;
+        }
+        super.primAddTargetConnection(connection, index);
     }
 
     @Override

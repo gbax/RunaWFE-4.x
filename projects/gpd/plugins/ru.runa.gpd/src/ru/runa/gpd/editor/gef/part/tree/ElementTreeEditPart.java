@@ -3,6 +3,7 @@ package ru.runa.gpd.editor.gef.part.tree;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.gef.EditPart;
 import org.eclipse.gef.editparts.AbstractTreeEditPart;
 
 import ru.runa.gpd.lang.model.GraphElement;
@@ -51,6 +52,20 @@ public class ElementTreeEditPart extends AbstractTreeEditPart implements Propert
             refreshChildren();
         } else if (PROPERTY_NAME.equals(messageId)) {
             refreshVisuals();
+        }
+    }
+
+    @Override
+    protected void reorderChild(EditPart editpart, int index) {
+        if (children.size() > index) {
+            super.reorderChild(editpart, index);
+        }
+    }
+
+    @Override
+    protected void refreshChildren() {
+        if (children != null && children.size() > 0) {
+            super.refreshChildren();
         }
     }
 
