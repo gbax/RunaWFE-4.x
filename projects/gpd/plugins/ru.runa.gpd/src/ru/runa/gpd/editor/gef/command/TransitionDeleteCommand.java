@@ -3,6 +3,7 @@ package ru.runa.gpd.editor.gef.command;
 import org.eclipse.gef.commands.Command;
 
 import ru.runa.gpd.lang.model.Node;
+import ru.runa.gpd.lang.model.PropertyNames;
 import ru.runa.gpd.lang.model.Transition;
 
 public class TransitionDeleteCommand extends Command {
@@ -27,6 +28,11 @@ public class TransitionDeleteCommand extends Command {
 
     @Override
     public void undo() {
-        source.addLeavingTransition(transition);
+        if (!source.getLeavingTransitions().contains(transition)) {
+            source.addLeavingTransition(transition);
+        }
+        // to refresh visuals in
+        // NodeGraphicalEditPart.propertyChange(PropertyChangeEvent)
+        transition.getTarget().firePropertyChange(PropertyNames.NODE_ARRIVING_TRANSITION_ADDED, null, transition);
     }
 }

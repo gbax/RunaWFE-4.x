@@ -123,26 +123,12 @@ public abstract class Node extends NamedGraphElement implements Describable {
     }
 
     public void addLeavingTransition(Transition transition) {
-        if (canAddLeavingTransition(transition)) {
-            boolean renameAfterAddition = getTransitionByName(transition.getName()) != null;
-            addChild(transition);
-            if (renameAfterAddition) {
-                transition.setName(getNextTransitionName());
-            }
-            onLeavingTransitionAdded(transition);
+        boolean renameAfterAddition = getTransitionByName(transition.getName()) != null;
+        addChild(transition);
+        if (renameAfterAddition) {
+            transition.setName(getNextTransitionName());
         }
-    }
-
-    private boolean canAddLeavingTransition(Transition candidate) {
-        List<Transition> transitions = getLeavingTransitions();
-        for (Transition transition : transitions) {
-            if (transition.getSource().equals(candidate.getSource()) && transition.getTarget().equals(candidate.getTarget())) {
-                // need to refresh visuals always
-                onLeavingTransitionAdded(transition);
-                return false;
-            }
-        }
-        return true;
+        onLeavingTransitionAdded(transition);
     }
 
     public void onLeavingTransitionAdded(Transition transition) {
@@ -228,7 +214,7 @@ public abstract class Node extends NamedGraphElement implements Describable {
     public boolean isExclusive() {
         return false;
     }
-    
+
     @Override
     public Node getCopy(GraphElement parent) {
         Node copy = (Node) super.getCopy(parent);

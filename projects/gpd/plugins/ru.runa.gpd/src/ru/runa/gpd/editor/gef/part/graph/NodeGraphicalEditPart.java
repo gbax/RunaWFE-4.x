@@ -1,7 +1,6 @@
 package ru.runa.gpd.editor.gef.part.graph;
 
 import java.beans.PropertyChangeEvent;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.draw2d.ConnectionAnchor;
@@ -64,28 +63,6 @@ public class NodeGraphicalEditPart extends ElementGraphicalEditPart implements N
     }
 
     @Override
-    protected void primAddSourceConnection(ConnectionEditPart connection, int index) {
-        if (sourceConnections == null) {
-            sourceConnections = new ArrayList<ConnectionEditPart>();
-        }
-        if (sourceConnections.size() < index) {
-            return;
-        }
-        super.primAddSourceConnection(connection, index);
-    }
-
-    @Override
-    protected void primAddTargetConnection(ConnectionEditPart connection, int index) {
-        if (targetConnections == null) {
-            targetConnections = new ArrayList<ConnectionEditPart>();
-        }
-        if (targetConnections.size() < index) {
-            return;
-        }
-        super.primAddTargetConnection(connection, index);
-    }
-
-    @Override
     protected void refreshVisuals() {
         getFigure().setBounds(getModel().getConstraint());
         getFigure().revalidate();
@@ -97,7 +74,8 @@ public class NodeGraphicalEditPart extends ElementGraphicalEditPart implements N
         String messageId = event.getPropertyName();
         if (NODE_ARRIVING_TRANSITION_ADDED.equals(messageId) || NODE_ARRIVING_TRANSITION_REMOVED.equals(messageId)) {
             refreshTargetConnections();
-        } else if (NODE_LEAVING_TRANSITION_ADDED.equals(messageId) || NODE_LEAVING_TRANSITION_REMOVED.equals(messageId) || PROPERTY_CONFIGURATION.equals(messageId)) {
+        } else if (NODE_LEAVING_TRANSITION_ADDED.equals(messageId) || NODE_LEAVING_TRANSITION_REMOVED.equals(messageId)
+                || PROPERTY_CONFIGURATION.equals(messageId)) {
             refreshSourceConnections();
         } else if (NODE_BOUNDS_RESIZED.equals(messageId)) {
             refreshVisuals();
