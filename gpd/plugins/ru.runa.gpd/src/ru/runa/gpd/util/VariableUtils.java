@@ -3,6 +3,9 @@ package ru.runa.gpd.util;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import ru.runa.gpd.PluginLogger;
 import ru.runa.gpd.lang.model.Delegable;
@@ -10,12 +13,31 @@ import ru.runa.gpd.lang.model.GraphElement;
 import ru.runa.gpd.lang.model.Variable;
 import ru.runa.gpd.lang.model.VariableContainer;
 import ru.runa.gpd.lang.model.VariableUserType;
+import ru.runa.wfe.var.format.ListFormat;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class VariableUtils {
+
+    private static final Pattern LIST_ENTRY_PATTERN = Pattern.compile("\\(\\s*([^\\)]+)\\)");
+
+    public static final String getListVariableComponent(Variable variable) {
+        String formatStr = variable.getFormat();
+        if (!formatStr.contains(ListFormat.class.getName())) {
+            return null;
+        }
+        Matcher m = LIST_ENTRY_PATTERN.matcher(formatStr);
+        if (!m.find()) {
+            return null;
+        }
+        MatchResult mr = m.toMatchResult();
+        if (mr.groupCount() != 1) {
+            return null;
+        }
+        return mr.group(1).trim();
+    }
 
     public static Map<String, Variable> toMap(List<Variable> variables) {
         Map<String, Variable> result = Maps.newHashMapWithExpectedSize(variables.size());

@@ -8,12 +8,12 @@ import org.eclipse.swt.graphics.Image;
 import ru.runa.gpd.lang.NodeTypeDefinition;
 import ru.runa.gpd.lang.model.GraphElement;
 
-public class GPDChangeNode extends TextEditChangeNode {
+public class ChangeNode extends TextEditChangeNode {
     private final NodeTypeDefinition definition;
     private final String notation;
     private String label;
 
-    public GPDChangeNode(TextEditBasedChange change, Object element) {
+    public ChangeNode(TextEditBasedChange change, Object element) {
         super(change);
         if (element != null && element instanceof GraphElement) {
             GraphElement graphElement = (GraphElement) element;
@@ -25,7 +25,7 @@ public class GPDChangeNode extends TextEditChangeNode {
         }
     }
 
-    public GPDChangeNode(TextEditBasedChange change, Object element, String label) {
+    public ChangeNode(TextEditBasedChange change, Object element, String label) {
         this(change, element);
         this.label = label;
     }

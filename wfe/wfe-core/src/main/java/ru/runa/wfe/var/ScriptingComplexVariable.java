@@ -40,6 +40,9 @@ public class ScriptingComplexVariable extends ComplexVariable {
             for (VariableDefinition definition : getUserType().getAttributes()) {
                 if (Objects.equal(key, definition.getScriptingName())) {
                     object = super.get(definition.getName());
+                    if (object == null && definition.getUserType() != null) {
+                        object = new ComplexVariable(definition);
+                    }
                     break;
                 }
             }

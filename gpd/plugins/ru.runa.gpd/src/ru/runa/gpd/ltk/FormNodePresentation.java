@@ -60,7 +60,7 @@ public class FormNodePresentation extends VariableRenameProvider<FormNode> {
                 @Override
                 public Object getAdapter(Class adapter) {
                     if (adapter == TextEditChangeNode.class) {
-                        return new GPDChangeNode(this, element, label);
+                        return new ChangeNode(this, element, label);
                     }
                     return super.getAdapter(adapter);
                 }
