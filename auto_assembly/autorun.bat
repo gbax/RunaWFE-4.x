@@ -33,6 +33,8 @@ cd ../../rtn
 call mvn versions:set -DnewVersion=%wfeVersion%
 cd ../../wfe/wfe-cactus-it
 call mvn versions:set -DnewVersion=%wfeVersion%
+cd ../../gpd/plugins
+call mvn versions:set -DnewVersion=%wfeVersion%
 
 cd ..\installer\windows\
 
