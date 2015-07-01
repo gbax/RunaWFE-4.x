@@ -5,7 +5,8 @@
     <extensionElements>
       <runa:property name="showSwimlane" value="none"/>
       <runa:property name="documentation" value="A demo subprocess for Multi subprocess node"/>
-      <runa:property name="version" value="4.0.5"/>
+      <runa:property name="version" value="4.2.1.201506302219"/>
+      <runa:property name="accessType" value="Process"/>
     </extensionElements>
     <laneSet id="laneSet1">
       <lane id="ID6" name="operator">
