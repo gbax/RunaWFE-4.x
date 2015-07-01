@@ -10,7 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import ru.runa.wfe.definition.dao.ProcessDefinitionLoader;
+import ru.runa.wfe.definition.dao.IProcessDefinitionLoader;
 import ru.runa.wfe.execution.ExecutionContext;
 import ru.runa.wfe.execution.IExecutorContextFactory;
 import ru.runa.wfe.lang.ProcessDefinition;
@@ -56,7 +56,7 @@ public class TaskListBuilder implements ITaskListBuilder {
     @Autowired
     private SubstitutionLogic substitutionLogic;
     @Autowired
-    private ProcessDefinitionLoader processDefinitionLoader;
+    private IProcessDefinitionLoader processDefinitionLoader;
     @Autowired
     private TaskDAO taskDAO;
     @Autowired
