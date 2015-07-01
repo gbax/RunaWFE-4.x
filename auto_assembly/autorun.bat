@@ -14,6 +14,7 @@ del eclipse-3.7.2-with-deltapack.zip
 
 mkdir trunk
 svn export https://svn.code.sf.net/p/runawfe/code/RunaWFE-4.x/trunk/projects trunk/projects
+rem svn export svn://alcomputer/RunaWFE-4.x/trunk/projects trunk/projects
 
 mkdir trunk\docs
 mkdir trunk\docs\guides
