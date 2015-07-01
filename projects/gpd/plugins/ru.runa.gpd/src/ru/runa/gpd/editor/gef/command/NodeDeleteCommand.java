@@ -44,12 +44,12 @@ public class NodeDeleteCommand extends Command {
 
     private void reattachTransition(Transition transition) {
         Node source = transitionSources.get(transition);
-        if (!source.getLeavingTransitions().contains(transition)) {
+        if (source.getLeavingTransitions().contains(transition)) {
+            // refresh visuals
+            transition.getTarget().firePropertyChange(PropertyNames.NODE_ARRIVING_TRANSITION_ADDED, null, transition);
+        } else {
             source.addLeavingTransition(transition);
         }
-        // to refresh visuals in
-        // NodeGraphicalEditPart.propertyChange(PropertyChangeEvent)
-        transition.getTarget().firePropertyChange(PropertyNames.NODE_ARRIVING_TRANSITION_ADDED, null, transition);
     }
 
     @Override

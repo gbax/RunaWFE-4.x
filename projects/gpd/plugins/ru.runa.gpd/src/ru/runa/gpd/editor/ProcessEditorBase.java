@@ -86,7 +86,7 @@ public abstract class ProcessEditorBase extends MultiPageEditorPart implements I
 
     @Override
     public void dispose() {
-    	try {
+        try {
             if (definition != null) {
                 definition.removePropertyChangeListener(this);
                 // If process definition is dirty (hasn't been saved) we should
@@ -297,6 +297,10 @@ public abstract class ProcessEditorBase extends MultiPageEditorPart implements I
                 boolean interested = IOUtils.looksLikeFormFile(resource.getName());
                 if (interested && !usedFormFiles.contains(resource.getName())) {
                     PluginLogger.logInfo("Deleting unused " + resource);
+                    resource.delete(true, null);
+                }
+                if (ParContentProvider.PROCESS_IMAGE_OLD_FILE_NAME.equals(resource.getName())) {
+                    PluginLogger.logInfo("Deleting jpg graph image: " + resource);
                     resource.delete(true, null);
                 }
             }

@@ -28,11 +28,11 @@ public class TransitionDeleteCommand extends Command {
 
     @Override
     public void undo() {
-        if (!source.getLeavingTransitions().contains(transition)) {
+        if (source.getLeavingTransitions().contains(transition)) {
+            // refresh visuals
+            transition.getTarget().firePropertyChange(PropertyNames.NODE_ARRIVING_TRANSITION_ADDED, null, transition);
+        } else {
             source.addLeavingTransition(transition);
         }
-        // to refresh visuals in
-        // NodeGraphicalEditPart.propertyChange(PropertyChangeEvent)
-        transition.getTarget().firePropertyChange(PropertyNames.NODE_ARRIVING_TRANSITION_ADDED, null, transition);
     }
 }

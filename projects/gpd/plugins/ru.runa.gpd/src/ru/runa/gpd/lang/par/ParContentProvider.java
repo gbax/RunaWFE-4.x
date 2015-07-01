@@ -25,6 +25,7 @@ public class ParContentProvider {
     public static final String PROCESS_DEFINITION_DESCRIPTION_FILE_NAME = "index.html";
     public static final String FORM_CSS_FILE_NAME = "form.css";
     public static final String PROCESS_IMAGE_FILE_NAME = "processimage.png";
+    public static final String PROCESS_IMAGE_OLD_FILE_NAME = "processimage.jpg";
     public static final String PROCESS_INSTANCE_START_IMAGE_FILE_NAME = "start.png";
     private static final List<AuxContentProvider> contentProviders = new ArrayList<AuxContentProvider>();
     static {
