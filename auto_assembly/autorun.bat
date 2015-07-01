@@ -1,4 +1,4 @@
-set wfeVersion=4.2
+set wfeVersion=4.2.0
 rd /S /Q build
 rd /S /Q results
 mkdir build
