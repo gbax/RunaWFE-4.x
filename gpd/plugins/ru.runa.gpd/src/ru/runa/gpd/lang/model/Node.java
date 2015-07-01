@@ -214,7 +214,7 @@ public abstract class Node extends NamedGraphElement implements Describable {
     public boolean isExclusive() {
         return false;
     }
-    
+
     @Override
     public Node getCopy(GraphElement parent) {
         Node copy = (Node) super.getCopy(parent);

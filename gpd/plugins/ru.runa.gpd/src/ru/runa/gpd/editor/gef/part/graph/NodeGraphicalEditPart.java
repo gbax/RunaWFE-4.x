@@ -74,7 +74,8 @@ public class NodeGraphicalEditPart extends ElementGraphicalEditPart implements N
         String messageId = event.getPropertyName();
         if (NODE_ARRIVING_TRANSITION_ADDED.equals(messageId) || NODE_ARRIVING_TRANSITION_REMOVED.equals(messageId)) {
             refreshTargetConnections();
-        } else if (NODE_LEAVING_TRANSITION_ADDED.equals(messageId) || NODE_LEAVING_TRANSITION_REMOVED.equals(messageId) || PROPERTY_CONFIGURATION.equals(messageId)) {
+        } else if (NODE_LEAVING_TRANSITION_ADDED.equals(messageId) || NODE_LEAVING_TRANSITION_REMOVED.equals(messageId)
+                || PROPERTY_CONFIGURATION.equals(messageId)) {
             refreshSourceConnections();
         } else if (NODE_BOUNDS_RESIZED.equals(messageId)) {
             refreshVisuals();

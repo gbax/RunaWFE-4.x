@@ -54,6 +54,9 @@ public class EmailConfigParser {
                 EmailConfig baseConfig = parseFromFile(config.getCommonProperties().get(EmailConfig.COMMON_BASE_PROPERTY_FILE_NAME));
                 config.getConnectionProperties().putAll(baseConfig.getConnectionProperties());
                 config.getHeaderProperties().putAll(baseConfig.getHeaderProperties());
+                config.setMessage(baseConfig.getMessage());
+                config.getContentProperties().putAll(baseConfig.getContentProperties());
+                config.getAttachmentVariableNames().addAll(baseConfig.getAttachmentVariableNames());
             }
             Element connElement = root.element("connection");
             if (connElement != null) {

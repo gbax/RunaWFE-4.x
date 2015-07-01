@@ -45,6 +45,7 @@ public class ElementTreeEditPart extends AbstractTreeEditPart implements Propert
         setWidgetImage(getModel().getEntryImage());
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         String messageId = evt.getPropertyName();
         if (PROPERTY_CHILDS_CHANGED.equals(messageId)) {

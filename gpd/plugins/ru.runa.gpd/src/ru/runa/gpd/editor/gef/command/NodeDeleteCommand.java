@@ -8,6 +8,7 @@ import org.eclipse.gef.commands.Command;
 
 import ru.runa.gpd.lang.model.Node;
 import ru.runa.gpd.lang.model.ProcessDefinition;
+import ru.runa.gpd.lang.model.PropertyNames;
 import ru.runa.gpd.lang.model.Transition;
 
 public class NodeDeleteCommand extends Command {
@@ -23,9 +24,9 @@ public class NodeDeleteCommand extends Command {
     }
 
     private void detachTransitions(List<Transition> transitions) {
-    	for (Transition transition : transitions) {
+        for (Transition transition : transitions) {
             detachTransition(transition);
-		}
+        }
     }
 
     private void reattachTransitions() {
@@ -43,7 +44,12 @@ public class NodeDeleteCommand extends Command {
 
     private void reattachTransition(Transition transition) {
         Node source = transitionSources.get(transition);
-        source.addLeavingTransition(transition);
+        if (!source.getLeavingTransitions().contains(transition)) {
+            source.addLeavingTransition(transition);
+        }
+        // to refresh visuals in
+        // NodeGraphicalEditPart.propertyChange(PropertyChangeEvent)
+        transition.getTarget().firePropertyChange(PropertyNames.NODE_ARRIVING_TRANSITION_ADDED, null, transition);
     }
 
     @Override
