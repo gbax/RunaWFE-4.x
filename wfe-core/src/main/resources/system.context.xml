@@ -395,4 +395,6 @@
 	
 	<bean id="taskCacheCtrl" class="ru.runa.wfe.task.cache.TaskCacheCtrl" factory-method="getInstance" />
 	
+	<bean id="executorContextFactory" class="ru.runa.wfe.execution.DefaultExecutorContextFactory" />
+	
 </beans>

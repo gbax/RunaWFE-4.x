@@ -27,6 +27,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 import ru.runa.wfe.InternalApplicationException;
 import ru.runa.wfe.audit.ProcessLog;
@@ -68,11 +69,15 @@ public class ExecutionContext {
     @Autowired
     private VariableDAO variableDAO;
 
-    public ExecutionContext(ProcessDefinition processDefinition, Token token) {
+    protected ExecutionContext(ApplicationContext appContext, ProcessDefinition processDefinition, Token token) {
         this.processDefinition = processDefinition;
         this.token = token;
         Preconditions.checkNotNull(token, "token");
-        ApplicationContextFactory.getContext().getAutowireCapableBeanFactory().autowireBean(this);
+        appContext.getAutowireCapableBeanFactory().autowireBean(this);
+    }
+
+    public ExecutionContext(ProcessDefinition processDefinition, Token token) {
+        this(ApplicationContextFactory.getContext(), processDefinition, token);
     }
 
     public ExecutionContext(ProcessDefinition processDefinition, Process process) {

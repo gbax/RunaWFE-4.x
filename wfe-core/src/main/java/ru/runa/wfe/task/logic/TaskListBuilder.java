@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import ru.runa.wfe.definition.dao.ProcessDefinitionLoader;
 import ru.runa.wfe.execution.ExecutionContext;
+import ru.runa.wfe.execution.IExecutorContextFactory;
 import ru.runa.wfe.lang.ProcessDefinition;
 import ru.runa.wfe.presentation.BatchPresentation;
 import ru.runa.wfe.presentation.hibernate.BatchPresentationHibernateCompiler;
@@ -58,6 +59,8 @@ public class TaskListBuilder implements ITaskListBuilder {
     private ProcessDefinitionLoader processDefinitionLoader;
     @Autowired
     private TaskDAO taskDAO;
+    @Autowired
+    private IExecutorContextFactory executorContextFactory;
 
     public TaskListBuilder(TaskCache cache) {
         taskCache = cache;
@@ -105,7 +108,7 @@ public class TaskListBuilder implements ITaskListBuilder {
             log.debug(String.format("getAcceptableTask: task: %s is ignored due to ignore subsitution rule", task));
             return null;
         }
-        return getAcceptableTask(task, actor, batchPresentation, new ExecutionContext(processDefinition, task));
+        return getAcceptableTask(task, actor, batchPresentation, executorContextFactory.createExecutionContext(processDefinition, task));
     }
 
     protected WfTask getAcceptableTask(Task task, Actor actor, BatchPresentation batchPresentation, ExecutionContext executionContext) {
