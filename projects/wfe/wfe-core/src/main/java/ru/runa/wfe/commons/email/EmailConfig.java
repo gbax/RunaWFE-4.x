@@ -13,6 +13,7 @@ import ru.runa.wfe.var.IVariableProvider;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -30,14 +31,14 @@ public class EmailConfig implements Serializable {
     public static final String CONTENT_USE_MESSAGE_FROM_TASK_FORM = "bodyInlined";
     public static final String CONTENT_MESSAGE_TYPE = "bodyType";
 
-    private final Map<String, String> commonProperties = new HashMap<String, String>();
-    private final Map<String, String> connectionProperties = new HashMap<String, String>();
-    private final Map<String, String> headerProperties = new HashMap<String, String>();
-    private final Map<String, String> contentProperties = new HashMap<String, String>();
+    private final Map<String, String> commonProperties = Maps.newHashMap();
+    private final Map<String, String> connectionProperties = Maps.newHashMap();
+    private final Map<String, String> headerProperties = Maps.newHashMap();
+    private final Map<String, String> contentProperties = Maps.newHashMap();
     private final List<String> attachmentVariableNames = Lists.newArrayList();
     private final List<Attachment> attachments = Lists.newArrayList();
     private String messageId;
-    private String message;
+    private String message = "";
 
     public Map<String, String> getCommonProperties() {
         return commonProperties;
@@ -76,7 +77,10 @@ public class EmailConfig implements Serializable {
     }
 
     public void setMessage(String message) {
-        this.message = message;
+        if (!Strings.isNullOrEmpty(message)) {
+            // important: base configuration value can be overridden by empty
+            this.message = message;
+        }
     }
 
     public boolean isThrowErrorOnFailure() {
