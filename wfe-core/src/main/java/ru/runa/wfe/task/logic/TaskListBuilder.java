@@ -23,8 +23,8 @@ import ru.runa.wfe.ss.logic.ISubstitutionLogic;
 import ru.runa.wfe.task.Task;
 import ru.runa.wfe.task.cache.TaskCache;
 import ru.runa.wfe.task.dao.TaskDAO;
+import ru.runa.wfe.task.dto.IWfTaskFactory;
 import ru.runa.wfe.task.dto.WfTask;
-import ru.runa.wfe.task.dto.WfTaskFactory;
 import ru.runa.wfe.user.Actor;
 import ru.runa.wfe.user.Executor;
 import ru.runa.wfe.user.Group;
@@ -50,7 +50,7 @@ public class TaskListBuilder implements ITaskListBuilder {
 
     private final TaskCache taskCache;
     @Autowired
-    private WfTaskFactory taskObjectFactory;
+    private IWfTaskFactory taskObjectFactory;
     @Autowired
     private ExecutorDAO executorDAO;
     @Autowired
