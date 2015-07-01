@@ -19,7 +19,7 @@ import ru.runa.wfe.presentation.hibernate.BatchPresentationHibernateCompiler;
 import ru.runa.wfe.ss.Substitution;
 import ru.runa.wfe.ss.SubstitutionCriteria;
 import ru.runa.wfe.ss.TerminatorSubstitution;
-import ru.runa.wfe.ss.logic.SubstitutionLogic;
+import ru.runa.wfe.ss.logic.ISubstitutionLogic;
 import ru.runa.wfe.task.Task;
 import ru.runa.wfe.task.cache.TaskCache;
 import ru.runa.wfe.task.dao.TaskDAO;
@@ -54,7 +54,7 @@ public class TaskListBuilder implements ITaskListBuilder {
     @Autowired
     private ExecutorDAO executorDAO;
     @Autowired
-    private SubstitutionLogic substitutionLogic;
+    private ISubstitutionLogic substitutionLogic;
     @Autowired
     private IProcessDefinitionLoader processDefinitionLoader;
     @Autowired
