@@ -21,7 +21,6 @@ import ru.runa.wfe.ss.TerminatorSubstitution;
 import ru.runa.wfe.ss.logic.SubstitutionLogic;
 import ru.runa.wfe.task.Task;
 import ru.runa.wfe.task.cache.TaskCache;
-import ru.runa.wfe.task.cache.TaskCacheCtrl;
 import ru.runa.wfe.task.dao.TaskDAO;
 import ru.runa.wfe.task.dto.WfTask;
 import ru.runa.wfe.task.dto.WfTaskFactory;
@@ -48,7 +47,7 @@ public class TaskListBuilder implements ITaskListBuilder {
 
     private static final Log log = LogFactory.getLog(TaskListBuilder.class);
 
-    private final TaskCache taskCache = TaskCacheCtrl.getInstance();
+    private final TaskCache taskCache;
     @Autowired
     private WfTaskFactory taskObjectFactory;
     @Autowired
@@ -59,6 +58,10 @@ public class TaskListBuilder implements ITaskListBuilder {
     private ProcessDefinitionLoader processDefinitionLoader;
     @Autowired
     private TaskDAO taskDAO;
+
+    public TaskListBuilder(TaskCache cache) {
+        taskCache = cache;
+    }
 
     @Override
     public List<WfTask> getTasks(Actor actor, BatchPresentation batchPresentation) {
