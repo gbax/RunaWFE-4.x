@@ -397,4 +397,6 @@
 	
 	<bean id="executorContextFactory" class="ru.runa.wfe.execution.DefaultExecutorContextFactory" />
 	
+	<bean id="batchPresentationCompilerFactory" class="ru.runa.wfe.presentation.hibernate.BatchPresentationHibernateCompilerFactory" />
+	
 </beans>

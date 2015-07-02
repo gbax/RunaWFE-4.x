@@ -16,7 +16,7 @@ import ru.runa.wfe.execution.ExecutionContext;
 import ru.runa.wfe.execution.IExecutorContextFactory;
 import ru.runa.wfe.lang.ProcessDefinition;
 import ru.runa.wfe.presentation.BatchPresentation;
-import ru.runa.wfe.presentation.hibernate.BatchPresentationHibernateCompiler;
+import ru.runa.wfe.presentation.hibernate.IBatchPresentationCompilerFactory;
 import ru.runa.wfe.ss.Substitution;
 import ru.runa.wfe.ss.SubstitutionCriteria;
 import ru.runa.wfe.ss.TerminatorSubstitution;
@@ -61,6 +61,8 @@ public class TaskListBuilder implements ITaskListBuilder {
     private IGenericDAO<Task> taskDAO;
     @Autowired
     private IExecutorContextFactory executorContextFactory;
+    @Autowired
+    private IBatchPresentationCompilerFactory<?> batchPresentationCompilerFactory;
 
     public TaskListBuilder(TaskCache cache) {
         taskCache = cache;
@@ -77,7 +79,9 @@ public class TaskListBuilder implements ITaskListBuilder {
         Set<Executor> executorsToGetTasksByMembership = getExecutorsToGetTasks(actor, false);
         Set<Executor> executorsToGetTasks = Sets.newHashSet(executorsToGetTasksByMembership);
         getSubstituteExecutorsToGetTasks(actor, executorsToGetTasks);
-        List<Task> tasks = new BatchPresentationHibernateCompiler(batchPresentation).getBatch(executorsToGetTasks, "executor", false);
+        @SuppressWarnings("unchecked")
+        List<Task> tasks = (List<Task>) batchPresentationCompilerFactory.createCompiler(batchPresentation).getBatch(executorsToGetTasks, "executor",
+                false);
         for (Task task : tasks) {
             try {
                 WfTask acceptable = getAcceptableTask(task, actor, batchPresentation, executorsToGetTasksByMembership);
