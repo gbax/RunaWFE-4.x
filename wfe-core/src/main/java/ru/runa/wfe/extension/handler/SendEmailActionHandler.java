@@ -51,6 +51,7 @@ public class SendEmailActionHandler extends ActionHandlerBase {
             Task task = executionContext.getTask();
             Interaction interaction = task != null ? executionContext.getProcessDefinition().getInteractionNotNull(task.getNodeId()) : null;
             Map<String, Object> map = Maps.newHashMap();
+            map.put("task", task);
             map.put("interaction", interaction);
             map.put("process", executionContext.getProcess());
             ScriptingVariableProvider scriptingVariableProvider = new ScriptingVariableProvider(executionContext.getVariableProvider());

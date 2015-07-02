@@ -8,9 +8,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONArray;
 
 import ru.runa.common.WebResources;
 import ru.runa.common.web.Resources;
@@ -24,9 +26,11 @@ import ru.runa.wfe.commons.web.WebHelper;
 import ru.runa.wfe.commons.web.WebUtils;
 import ru.runa.wfe.presentation.BatchPresentation;
 import ru.runa.wfe.presentation.BatchPresentationFactory;
+import ru.runa.wfe.service.client.FileVariableProxy;
 import ru.runa.wfe.service.delegate.Delegates;
 import ru.runa.wfe.user.Executor;
 import ru.runa.wfe.user.User;
+import ru.runa.wfe.util.OrderedJSONObject;
 import ru.runa.wfe.var.ComplexVariable;
 import ru.runa.wfe.var.IVariableProvider;
 import ru.runa.wfe.var.VariableDefinition;
@@ -61,6 +65,8 @@ import com.google.common.collect.Maps;
 
 public class ViewUtil {
     private static final Log log = LogFactory.getLog(ViewUtil.class);
+
+    private static final Random random = new Random(System.currentTimeMillis());
 
     public static String createExecutorSelect(User user, WfVariable variable) {
         return createExecutorSelect(user, variable.getDefinition().getName(), variable.getDefinition().getFormatNotNull(), variable.getValue(), true);
@@ -210,6 +216,59 @@ public class ViewUtil {
         return html;
     }
 
+    @SuppressWarnings("unchecked")
+    public static final String getUserTypeListTable(User user, WebHelper webHelper, WfVariable variable, WfVariable dectSelectVariable,
+            Long processId, String sortFieldName, boolean isMultiDim) {
+        if (!(variable.getValue() instanceof List)) {
+            return "";
+        }
+        JSONArray objectsList = new JSONArray();
+        List<?> values = (List<?>) variable.getValue();
+        for (Object value : values) {
+            if (!(value instanceof ComplexVariable)) {
+                return "";
+            }
+            ComplexVariable cvar = (ComplexVariable) value;
+            OrderedJSONObject cvarObj = new OrderedJSONObject();
+            for (VariableDefinition varDef : cvar.getUserType().getAttributes()) {
+                if (cvar.get(varDef.getName()) == null) {
+                    cvarObj.put(varDef.getName(), "");
+                    continue;
+                }
+                VariableFormat format = FormatCommons.create(varDef);
+                if (dectSelectVariable == null) {
+                    if (format instanceof FileFormat) {
+                        FileVariableProxy proxy = (FileVariableProxy) cvar.get(varDef.getName());
+                        cvarObj.put(varDef.getName(), getFileComponent(webHelper, proxy.getName(), proxy, false));
+                    } else {
+                        cvarObj.put(varDef.getName(), format.format(cvar.get(varDef.getName())));
+                    }
+                } else {
+                    cvarObj.put(varDef.getName(), format.format(cvar.get(varDef.getName())));
+                }
+            }
+            objectsList.add(cvarObj);
+        }
+        String uniquename = String.format("%s_%x", variable.getDefinition().getScriptingNameWithoutDots(), random.nextInt());
+        String result = "<script src=\"/wfe/js/tidy-table.js\"></script>\n";
+        InputStream javascriptStream = ClassLoaderUtil.getAsStreamNotNull("scripts/ViewUtil.UserTypeListTable.js", ViewUtil.class);
+        Map<String, String> substitutions = new HashMap<String, String>();
+        substitutions.put("UNIQUENAME", uniquename);
+        substitutions.put("JSONDATATEMPLATE", objectsList.toJSONString());
+        substitutions.put("SORTFIELDNAMEVALUE", String.format("%s", sortFieldName));
+        substitutions.put("DIMENTIONALVALUE", String.format("%s", isMultiDim));
+        substitutions.put("SELECTABLEVALUE", String.format("%s", dectSelectVariable != null));
+        if (dectSelectVariable != null) {
+            substitutions.put("DECTSELECTNAME", dectSelectVariable.getDefinition().getName());
+        } else {
+            substitutions.put("DECTSELECTNAME", "");
+        }
+        result += WebUtils.getFreemarkerTagScript(webHelper, javascriptStream, substitutions);
+        result += "<link rel=\"stylesheet\" type=\"text/css\" href=\"/wfe/css/tidy-table.css\">\n";
+        result += String.format("<div id=\"container%s\"></div>", uniquename);
+        return result;
+    }
+
     public static String getComponentInput(User user, WebHelper webHelper, WfVariable variable) {
         String variableName = variable.getDefinition().getName();
         VariableFormat variableFormat = variable.getDefinition().getFormatNotNull();
@@ -318,7 +377,7 @@ public class ViewUtil {
             String inputTag = ViewUtil.getComponentInput(user, webHelper, templateComponentVariable);
             inputTag = inputTag.replaceAll("\"", "'").replaceAll("\t", "").replaceAll("\n", "");
             substitutions.put("COMPONENT_INPUT", inputTag);
-            substitutions.put("COMPONENT_JS_HANDLER", ViewUtil.getComponentJSFunction(componentFormat));
+            substitutions.put("COMPONENT_JS_HANDLER", ViewUtil.getComponentJSFunction(variable));
             StringBuffer html = new StringBuffer();
             InputStream javascriptStream = ClassLoaderUtil.getAsStreamNotNull("scripts/ViewUtil.EditListTag.js", ViewUtil.class);
             html.append(WebUtils.getFreemarkerTagScript(webHelper, javascriptStream, substitutions));
@@ -521,6 +580,63 @@ public class ViewUtil {
             return displaySupport.formatHtml(user, webHelper, processId, variable.getDefinition().getName(), variable.getValue());
         }
         throw new InternalApplicationException("No output method implemented for " + variableFormat);
+    }
+
+    public static String getComponentJSFunction(WfVariable variable) {
+        VariableFormat variableFormat = variable.getDefinition().getFormatNotNull();
+        if (DateFormat.class == variableFormat.getClass() || TimeFormat.class == variableFormat.getClass()
+                || DateTimeFormat.class == variableFormat.getClass() || FileFormat.class == variableFormat.getClass()) {
+            return getComponentJSFunction(variableFormat);
+        }
+        if (ListFormat.class == variableFormat.getClass()) {
+            boolean hasDate = false;
+            boolean hasTime = false;
+            boolean hasDateTime = false;
+            boolean hasFile = false;
+            String componentJsHandlers = "";
+            String className;
+            int i = 0;
+            while ((className = ((ListFormat) variableFormat).getComponentClassName(i++)) != null) {
+                if (DateFormat.class.getName().equals(className) && !hasDate) {
+                    hasDate = true;
+                    componentJsHandlers += "$('.inputDate').datepicker({ dateFormat: 'dd.mm.yy', buttonImage: '/wfe/images/calendar.gif' });\n";
+                } else if (TimeFormat.class.getName().equals(className) && !hasTime) {
+                    hasTime = true;
+                    componentJsHandlers += "$('.inputTime').timepicker({ ampm: false, seconds: false });\n";
+                } else if (DateTimeFormat.class.getName().equals(className) && !hasDateTime) {
+                    hasDateTime = true;
+                    componentJsHandlers += "$('.inputDateTime').datetimepicker({ dateFormat: 'dd.mm.yy' });\n";
+                } else if (FileFormat.class.getName().equals(className) && !hasFile && WebResources.isAjaxFileInputEnabled()) {
+                    hasFile = true;
+                    componentJsHandlers += "$('.dropzone').each(function () { initFileInput($(this)) });\n";
+                } else if (ListFormat.class.getName().equals(className)) {
+                    // TODO: handle nested list-type entries
+                }
+            }
+            for (Map.Entry<String, VariableUserType> entry : ((ListFormat) variableFormat).getUserTypes().entrySet()) {
+                VariableUserType varUserType = entry.getValue();
+                for (VariableDefinition varDef : varUserType.getAttributes()) {
+                    VariableFormat nestedFormat = FormatCommons.create(varDef);
+                    if (DateFormat.class == nestedFormat.getClass() && !hasDate) {
+                        hasDate = true;
+                        componentJsHandlers += getComponentJSFunction(nestedFormat);
+                    } else if (TimeFormat.class == nestedFormat.getClass() && !hasTime) {
+                        hasTime = true;
+                        componentJsHandlers += getComponentJSFunction(nestedFormat);
+                    } else if (DateTimeFormat.class == nestedFormat.getClass() && !hasDateTime) {
+                        hasDateTime = true;
+                        componentJsHandlers += getComponentJSFunction(nestedFormat);
+                    } else if (FileFormat.class == nestedFormat.getClass() && !hasFile) {
+                        hasFile = true;
+                        componentJsHandlers += getComponentJSFunction(nestedFormat);
+                    } else if (ListFormat.class == nestedFormat.getClass()) {
+                        // TODO: handle nested list-type entries
+                    }
+                }
+            }
+            return componentJsHandlers;
+        }
+        return "";
     }
 
     public static String getComponentJSFunction(VariableFormat variableFormat) {

@@ -19,6 +19,9 @@ package ru.runa.wfe.var.logic;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import ru.runa.wfe.audit.AdminActionLog;
 import ru.runa.wfe.commons.TypeConversionUtil;
@@ -37,7 +40,6 @@ import ru.runa.wfe.var.format.FormatCommons;
 import ru.runa.wfe.var.format.ListFormat;
 import ru.runa.wfe.var.format.MapFormat;
 import ru.runa.wfe.var.format.VariableFormat;
-import ru.runa.wfe.var.format.VariableFormatContainer;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
@@ -50,6 +52,10 @@ import com.google.common.collect.Lists;
  * @since 2.0
  */
 public class VariableLogic extends WFCommonLogic {
+
+    private static final Pattern HAS_QUALIFIER = Pattern.compile("\\[[^\\]]+\\]");
+    private static final Pattern DICT_QUALIFIER = Pattern.compile("(.+)\\[\\s*([^\\]]+)\\]");
+    private static final Pattern DICT_COMPLEX_QUALIFIER = Pattern.compile("(.+)\\[\\s*([^\\]]+)\\]\\s*\\.\\s*(.+)");
 
     public List<WfVariable> getVariables(User user, Long processId) throws ProcessDoesNotExistException {
         List<WfVariable> result = Lists.newArrayList();
@@ -101,13 +107,27 @@ public class VariableLogic extends WFCommonLogic {
         ProcessDefinition processDefinition = getDefinition(process);
         ExecutionContext executionContext = new ExecutionContext(processDefinition, process);
         String qualifier = null;
-        if (variableName.contains(VariableFormatContainer.COMPONENT_QUALIFIER_START)
-                && variableName.contains(VariableFormatContainer.COMPONENT_QUALIFIER_END)) {
-            int is = variableName.indexOf(VariableFormatContainer.COMPONENT_QUALIFIER_START);
-            int ie = variableName.indexOf(VariableFormatContainer.COMPONENT_QUALIFIER_END);
-            qualifier = variableName.substring(is + 1, ie);
-            variableName = variableName.substring(0, is);
+        String variableSubName = null;
+
+        if (HAS_QUALIFIER.matcher(variableName).find()) {
+            Matcher dictMatcher = DICT_QUALIFIER.matcher(variableName);
+            Matcher dictComplexMatcher = DICT_COMPLEX_QUALIFIER.matcher(variableName);
+            if (dictComplexMatcher.find()) {
+                MatchResult mr = dictComplexMatcher.toMatchResult();
+                if (mr.groupCount() == 3) {
+                    variableName = mr.group(1).trim();
+                    qualifier = mr.group(2).trim();
+                    variableSubName = mr.group(3);
+                }
+            } else if (dictMatcher.find()) {
+                MatchResult mr = dictMatcher.toMatchResult();
+                if (mr.groupCount() == 2) {
+                    variableName = mr.group(1).trim();
+                    qualifier = mr.group(2).trim();
+                }
+            }
         }
+
         WfVariable variable = executionContext.getVariableProvider().getVariable(variableName);
         if (qualifier != null) {
             if (ListFormat.class.getName().equals(variable.getDefinition().getFormatClassName())) {
@@ -117,6 +137,15 @@ public class VariableLogic extends WFCommonLogic {
                     return new WfVariable(new VariableDefinition(true, variableName, variableName, qualifierFormat.getClass().getName()), null);
                 }
                 Object value = TypeConversionUtil.getListValue(list, Integer.parseInt(qualifier));
+                if (value instanceof ComplexVariable) {
+                    VariableUserType userType = ((ComplexVariable) value).getUserType();
+                    for (VariableDefinition def : userType.getAttributes()) {
+                        if (!def.getName().equals(variableSubName)) {
+                            continue;
+                        }
+                        return new WfVariable(def, ((ComplexVariable) value).get(variableSubName));
+                    }
+                }
                 return new WfVariable(new VariableDefinition(true, variableName, variableName, qualifierFormat.getClass().getName()), value);
             }
             if (MapFormat.class.getName().equals(variable.getDefinition().getFormatClassName())) {
@@ -131,8 +160,17 @@ public class VariableLogic extends WFCommonLogic {
                 for (Map.Entry<Object, Object> entry : map.entrySet()) {
                     String keyInQualifierFormat = qualifierFormat.format(entry.getKey());
                     if (Objects.equal(keyInQualifierFormat, qualifier) || (keyInQualifierFormat == null && Strings.isNullOrEmpty(qualifier))) {
-                        return new WfVariable(new VariableDefinition(true, variableName, variableName, qualifierFormat.getClass().getName()),
-                                entry.getValue());
+                        Object value = entry.getValue();
+                        if (value instanceof ComplexVariable) {
+                            VariableUserType userType = ((ComplexVariable) value).getUserType();
+                            for (VariableDefinition def : userType.getAttributes()) {
+                                if (!def.getName().equals(variableSubName)) {
+                                    continue;
+                                }
+                                return new WfVariable(def, ((ComplexVariable) value).get(variableSubName));
+                            }
+                        }
+                        return new WfVariable(new VariableDefinition(true, variableName, variableName, qualifierFormat.getClass().getName()), value);
                     }
                 }
                 throw new IllegalArgumentException("Invalid key = '" + qualifier + "'; all values: " + map);
