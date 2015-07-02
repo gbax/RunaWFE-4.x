@@ -174,6 +174,7 @@
                   <arg value="mvn clean -Djboss.zip.file=&quot;${jboss.zip.file}&quot; -Djboss.zip.folder=&quot;${jboss.zip.folder}&quot; -Dappserver=&quot;${appserver}&quot;"/>
                 </exec>
 
+		<copy file="resources\jdk-7u17-windows-x64.exe" tofile="resources\jdk_setup.exe" overwrite="true"/>
 		<replace file="resources\NSIS7\JDKInstallSupport.nsh"
 		  token="X64ONLY &quot;no&quot;"
                   value="X64ONLY &quot;yes&quot;"
@@ -189,6 +190,7 @@
                 </copy>
 		<delete dir="target/artifacts/Installer"/>
 
+		<copy file="resources\jdk-7u17-windows-i586.exe" tofile="resources\jdk_setup.exe" overwrite="true"/>
 		<replace file="resources\NSIS7\JDKInstallSupport.nsh"
 		  token="X64ONLY &quot;yes&quot;"
                   value="X64ONLY &quot;no&quot;"
