@@ -28,7 +28,7 @@ import ru.runa.wfe.task.dto.WfTask;
 import ru.runa.wfe.user.Actor;
 import ru.runa.wfe.user.Executor;
 import ru.runa.wfe.user.Group;
-import ru.runa.wfe.user.dao.ExecutorDAO;
+import ru.runa.wfe.user.dao.IExecutorDAO;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -52,7 +52,7 @@ public class TaskListBuilder implements ITaskListBuilder {
     @Autowired
     private IWfTaskFactory taskObjectFactory;
     @Autowired
-    private ExecutorDAO executorDAO;
+    private IExecutorDAO executorDAO;
     @Autowired
     private ISubstitutionLogic substitutionLogic;
     @Autowired
