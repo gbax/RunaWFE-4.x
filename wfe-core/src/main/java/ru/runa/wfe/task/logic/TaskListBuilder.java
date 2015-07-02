@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import ru.runa.wfe.commons.dao.IGenericDAO;
 import ru.runa.wfe.definition.dao.IProcessDefinitionLoader;
 import ru.runa.wfe.execution.ExecutionContext;
 import ru.runa.wfe.execution.IExecutorContextFactory;
@@ -22,7 +23,6 @@ import ru.runa.wfe.ss.TerminatorSubstitution;
 import ru.runa.wfe.ss.logic.ISubstitutionLogic;
 import ru.runa.wfe.task.Task;
 import ru.runa.wfe.task.cache.TaskCache;
-import ru.runa.wfe.task.dao.TaskDAO;
 import ru.runa.wfe.task.dto.IWfTaskFactory;
 import ru.runa.wfe.task.dto.WfTask;
 import ru.runa.wfe.user.Actor;
@@ -58,7 +58,7 @@ public class TaskListBuilder implements ITaskListBuilder {
     @Autowired
     private IProcessDefinitionLoader processDefinitionLoader;
     @Autowired
-    private TaskDAO taskDAO;
+    private IGenericDAO<Task> taskDAO;
     @Autowired
     private IExecutorContextFactory executorContextFactory;
 
