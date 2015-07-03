@@ -58,7 +58,7 @@ public class LocalFileSystemStorage implements IFileVariableStorage {
             try {
                 String variableName = index != null ? variable.getName() + index : variable.getName();
                 LocalFileSystemVariable fileSystemVariable = new LocalFileSystemVariable(variable, variableName, fileVariable);
-                Files.write(fileSystemVariable.getData(), getContentFile(fileSystemVariable.getVariablePath(), true));
+                Files.write(fileVariable.getData(), getContentFile(fileSystemVariable.getVariablePath(), true));
                 return fileSystemVariable;
             } catch (IOException e) {
                 throw new InternalApplicationException("Unable to save file variable to local drive", e);

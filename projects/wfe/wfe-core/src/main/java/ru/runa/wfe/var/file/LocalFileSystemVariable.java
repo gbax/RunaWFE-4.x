@@ -19,7 +19,6 @@ public class LocalFileSystemVariable implements IFileVariable {
     private static final long serialVersionUID = 1L;
     private String name;
     private String contentType;
-    private transient byte[] data;
     private String variablePath;
 
     public LocalFileSystemVariable() {
@@ -38,7 +37,6 @@ public class LocalFileSystemVariable implements IFileVariable {
             }
         }
         variablePath = variable.getProcess().getId() + "/" + b + "/" + version;
-        data = fileVariable.getData();
     }
 
     public String getVariablePath() {
@@ -47,15 +45,12 @@ public class LocalFileSystemVariable implements IFileVariable {
 
     @Override
     public byte[] getData() {
-        if (data == null) {
-            File file = LocalFileSystemStorage.getContentFile(variablePath, false);
-            try {
-                data = Files.toByteArray(file);
-            } catch (IOException e) {
-                throw new InternalApplicationException("Unable to read file variable from '" + file + "'", e);
-            }
+        File file = LocalFileSystemStorage.getContentFile(variablePath, false);
+        try {
+            return Files.toByteArray(file);
+        } catch (IOException e) {
+            throw new InternalApplicationException("Unable to read file variable from '" + file + "'", e);
         }
-        return data;
     }
 
     @Override
