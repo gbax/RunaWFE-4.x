@@ -10,6 +10,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import ru.runa.wfe.audit.ProcessLog;
+import ru.runa.wfe.audit.TaskEscalationLog;
+import ru.runa.wfe.audit.dao.ProcessLogDAO;
+import ru.runa.wfe.audit.presentation.ExecutorIdsValue;
 import ru.runa.wfe.commons.dao.IGenericDAO;
 import ru.runa.wfe.definition.dao.IProcessDefinitionLoader;
 import ru.runa.wfe.execution.ExecutionContext;
@@ -26,6 +30,7 @@ import ru.runa.wfe.task.cache.TaskCache;
 import ru.runa.wfe.task.dto.IWfTaskFactory;
 import ru.runa.wfe.task.dto.WfTask;
 import ru.runa.wfe.user.Actor;
+import ru.runa.wfe.user.EscalationGroup;
 import ru.runa.wfe.user.Executor;
 import ru.runa.wfe.user.Group;
 import ru.runa.wfe.user.dao.IExecutorDAO;
@@ -59,6 +64,8 @@ public class TaskListBuilder implements ITaskListBuilder {
     private IProcessDefinitionLoader processDefinitionLoader;
     @Autowired
     private IGenericDAO<Task> taskDAO;
+    @Autowired
+    private ProcessLogDAO processLogDAO;
     @Autowired
     private IExecutorContextFactory executorContextFactory;
     @Autowired
@@ -150,8 +157,38 @@ public class TaskListBuilder implements ITaskListBuilder {
         Set<Group> upperGroups = executorDAO.getExecutorParentsAll(actor);
         if (addOnlyInactiveGroups) {
             for (Group group : upperGroups) {
-                if (!hasActiveActorInGroup(group)) {
-                    executors.add(group);
+                if (group instanceof EscalationGroup) {
+                    EscalationGroup currGroup = (EscalationGroup)group;
+                    Executor originalExecutor = currGroup.getOriginalExecutor();
+                    if ((originalExecutor instanceof Actor)
+                              && originalExecutor.getId().equals(actor.getId())
+                              && (!((Actor)originalExecutor).isActive())) {
+                        executors.add(group);
+                        continue;
+                    }
+                    if ((originalExecutor instanceof Group)
+                              && executorDAO.getGroupActors((Group)originalExecutor).contains(actor)
+                              && (!hasActiveActorInGroup((Group)originalExecutor))) {
+                        executors.add(group);
+                        continue;
+                    }
+                    List<ProcessLog> pLogs = processLogDAO.getAll(currGroup.getProcessId());
+                    for (ProcessLog pLog : pLogs) {
+                        if (pLog instanceof TaskEscalationLog
+                                && pLog.getNodeId().equalsIgnoreCase(currGroup.getNodeId())) {
+                            log.debug("getExecutorsToGetTasks: Escalation log was found.");
+                            List<Long> ids = ((ExecutorIdsValue)pLog.getPatternArguments()[1]).getIds();
+                            log.debug("getExecutorsToGetTasks: Escalation executors id from log :" + ids);
+                            if (ids.contains(actor.getId()) && (!hasActiveActorInGroup(ids))) {
+                                executors.add(group);
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    if (!hasActiveActorInGroup(group)) {
+                        executors.add(group);
+                    }
                 }
             }
         } else {
@@ -207,6 +244,16 @@ public class TaskListBuilder implements ITaskListBuilder {
 
     protected boolean hasActiveActorInGroup(Group group) {
         for (Actor actor : executorDAO.getGroupActors(group)) {
+            if (actor.isActive()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected boolean hasActiveActorInGroup(List<Long> executorIds) {
+        for (Long executorId : executorIds) {
+            Actor actor = executorDAO.getActor(executorId);
             if (actor.isActive()) {
                 return true;
             }

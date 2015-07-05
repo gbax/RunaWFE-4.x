@@ -33,6 +33,9 @@ public class EscalationGroup extends TemporaryGroup {
     private Executor originalExecutor;
     private int level;
 
+    private long processId;
+    private String nodeId;
+
     @ManyToOne(targetEntity = Executor.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "ESCALATION_EXECUTOR_ID")
     @ForeignKey(name = "FK_GROUP_ESCALATION_EXECUTOR")
@@ -53,6 +56,24 @@ public class EscalationGroup extends TemporaryGroup {
         level = escalationLevel;
     }
 
+    @Column(name = "PROCESS_ID")
+    public long getProcessId() {
+        return processId;
+    }
+
+    public void setProcessId(long processId) {
+        this.processId = processId;
+    }
+
+    @Column(name = "NODE_ID")
+    public String getNodeId() {
+        return nodeId;
+    }
+
+    public void setNodeId(String nodeId) {
+        this.nodeId = nodeId;
+    }
+
     public static EscalationGroup create(Process process, Task task, Executor originalExecutor, int escalationLevel) {
         String identifier = GROUP_PREFIX + process.getId() + "_" + task.getId();
         EscalationGroup escalationGroup = new EscalationGroup();
@@ -61,6 +82,8 @@ public class EscalationGroup extends TemporaryGroup {
         escalationGroup.setDescription(process.getId().toString());
         escalationGroup.setOriginalExecutor(originalExecutor);
         escalationGroup.setLevel(escalationLevel);
+        escalationGroup.setProcessId(process.getId());
+        escalationGroup.setNodeId(task.getNodeId());
         return escalationGroup;
     }
 
