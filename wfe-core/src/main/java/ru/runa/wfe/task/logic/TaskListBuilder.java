@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import ru.runa.wfe.audit.ProcessLog;
 import ru.runa.wfe.audit.TaskEscalationLog;
-import ru.runa.wfe.audit.dao.ProcessLogDAO;
+import ru.runa.wfe.audit.dao.IProcessLogDAO;
 import ru.runa.wfe.audit.presentation.ExecutorIdsValue;
 import ru.runa.wfe.commons.dao.IGenericDAO;
 import ru.runa.wfe.definition.dao.IProcessDefinitionLoader;
@@ -65,7 +65,7 @@ public class TaskListBuilder implements ITaskListBuilder {
     @Autowired
     private IGenericDAO<Task> taskDAO;
     @Autowired
-    private ProcessLogDAO processLogDAO;
+    private IProcessLogDAO<ProcessLog> processLogDAO;
     @Autowired
     private IExecutorContextFactory executorContextFactory;
     @Autowired
@@ -158,26 +158,23 @@ public class TaskListBuilder implements ITaskListBuilder {
         if (addOnlyInactiveGroups) {
             for (Group group : upperGroups) {
                 if (group instanceof EscalationGroup) {
-                    EscalationGroup currGroup = (EscalationGroup)group;
+                    EscalationGroup currGroup = (EscalationGroup) group;
                     Executor originalExecutor = currGroup.getOriginalExecutor();
-                    if ((originalExecutor instanceof Actor)
-                              && originalExecutor.getId().equals(actor.getId())
-                              && (!((Actor)originalExecutor).isActive())) {
+                    if ((originalExecutor instanceof Actor) && originalExecutor.getId().equals(actor.getId())
+                            && (!((Actor) originalExecutor).isActive())) {
                         executors.add(group);
                         continue;
                     }
-                    if ((originalExecutor instanceof Group)
-                              && executorDAO.getGroupActors((Group)originalExecutor).contains(actor)
-                              && (!hasActiveActorInGroup((Group)originalExecutor))) {
+                    if ((originalExecutor instanceof Group) && executorDAO.getGroupActors((Group) originalExecutor).contains(actor)
+                            && (!hasActiveActorInGroup((Group) originalExecutor))) {
                         executors.add(group);
                         continue;
                     }
                     List<ProcessLog> pLogs = processLogDAO.getAll(currGroup.getProcessId());
                     for (ProcessLog pLog : pLogs) {
-                        if (pLog instanceof TaskEscalationLog
-                                && pLog.getNodeId().equalsIgnoreCase(currGroup.getNodeId())) {
+                        if (pLog instanceof TaskEscalationLog && pLog.getNodeId().equalsIgnoreCase(currGroup.getNodeId())) {
                             log.debug("getExecutorsToGetTasks: Escalation log was found.");
-                            List<Long> ids = ((ExecutorIdsValue)pLog.getPatternArguments()[1]).getIds();
+                            List<Long> ids = ((ExecutorIdsValue) pLog.getPatternArguments()[1]).getIds();
                             log.debug("getExecutorsToGetTasks: Escalation executors id from log :" + ids);
                             if (ids.contains(actor.getId()) && (!hasActiveActorInGroup(ids))) {
                                 executors.add(group);

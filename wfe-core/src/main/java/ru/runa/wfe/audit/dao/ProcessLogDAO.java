@@ -24,26 +24,23 @@ import com.google.common.collect.Lists;
 
 /**
  * DAO for {@link ProcessLog}.
- *
+ * 
  * @author dofs
  * @since 4.0
  */
-public class ProcessLogDAO extends GenericDAO<ProcessLog> {
+public class ProcessLogDAO extends GenericDAO<ProcessLog> implements IProcessLogDAO<ProcessLog> {
 
     @Autowired
     private ProcessLogAwareDao customizationDao;
 
-    /**
-     * @return process logs.
-     */
+    @SuppressWarnings("unchecked")
+    @Override
     public List<ProcessLog> getAll(Long processId) {
         return getHibernateTemplate().find("from ProcessLog where processId=? order by id asc", processId);
     }
 
-    /**
-     * @return process logs for embedded subprocess or for main process without
-     *         embedded subprocesses.
-     */
+    @SuppressWarnings("unchecked")
+    @Override
     public List<ProcessLog> get(Long processId, ProcessDefinition definition) {
         // List<ProcessLog> result = Lists.newArrayList();
         String checkQuery = "select count(t) from TransitionLog t where processId=? and t.nodeId is null";
@@ -114,9 +111,8 @@ public class ProcessLogDAO extends GenericDAO<ProcessLog> {
         }
     }
 
-    /**
-     * @return process logs.
-     */
+    @SuppressWarnings("unchecked")
+    @Override
     public List<ProcessLog> getAll(final ProcessLogFilter filter) {
         return getHibernateTemplate().executeFind(new HibernateCallback<List<ProcessLog>>() {
 
