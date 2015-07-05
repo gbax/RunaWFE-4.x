@@ -157,31 +157,9 @@ public class TaskListBuilder implements ITaskListBuilder {
         Set<Group> upperGroups = executorDAO.getExecutorParentsAll(actor);
         if (addOnlyInactiveGroups) {
             for (Group group : upperGroups) {
-                if (group instanceof EscalationGroup) {
-                    EscalationGroup currGroup = (EscalationGroup) group;
-                    Executor originalExecutor = currGroup.getOriginalExecutor();
-                    if ((originalExecutor instanceof Actor) && originalExecutor.getId().equals(actor.getId())
-                            && (!((Actor) originalExecutor).isActive())) {
-                        executors.add(group);
-                        continue;
-                    }
-                    if ((originalExecutor instanceof Group) && executorDAO.getGroupActors((Group) originalExecutor).contains(actor)
-                            && (!hasActiveActorInGroup((Group) originalExecutor))) {
-                        executors.add(group);
-                        continue;
-                    }
-                    List<ProcessLog> pLogs = processLogDAO.getAll(currGroup.getProcessId());
-                    for (ProcessLog pLog : pLogs) {
-                        if (pLog instanceof TaskEscalationLog && pLog.getNodeId().equalsIgnoreCase(currGroup.getNodeId())) {
-                            log.debug("getExecutorsToGetTasks: Escalation log was found.");
-                            List<Long> ids = ((ExecutorIdsValue) pLog.getPatternArguments()[1]).getIds();
-                            log.debug("getExecutorsToGetTasks: Escalation executors id from log :" + ids);
-                            if (ids.contains(actor.getId()) && (!hasActiveActorInGroup(ids))) {
-                                executors.add(group);
-                                break;
-                            }
-                        }
-                    }
+                if ((group instanceof EscalationGroup)
+                    && (isActorInInactiveEscalationGroup(actor, (EscalationGroup)group))){
+                    executors.add(group);
                 } else {
                     if (!hasActiveActorInGroup(group)) {
                         executors.add(group);
@@ -192,6 +170,31 @@ public class TaskListBuilder implements ITaskListBuilder {
             executors.addAll(upperGroups);
         }
         return executors;
+    }
+
+    protected boolean isActorInInactiveEscalationGroup(Actor actor, EscalationGroup group) {
+        EscalationGroup currGroup = (EscalationGroup) group;
+        Executor originalExecutor = currGroup.getOriginalExecutor();
+        if ((originalExecutor instanceof Actor) && originalExecutor.getId().equals(actor.getId())
+                && (!((Actor) originalExecutor).isActive())) {
+            return true;
+        }
+        if ((originalExecutor instanceof Group) && executorDAO.getGroupActors((Group) originalExecutor).contains(actor)
+                && (!hasActiveActorInGroup((Group) originalExecutor))) {
+            return true;
+        }
+        List<ProcessLog> pLogs = processLogDAO.getAll(currGroup.getProcessId());
+        for (ProcessLog pLog : pLogs) {
+            if (pLog instanceof TaskEscalationLog && pLog.getNodeId().equalsIgnoreCase(currGroup.getNodeId())) {
+                log.debug("getExecutorsToGetTasks: Escalation log was found.");
+                List<Long> ids = ((ExecutorIdsValue) pLog.getPatternArguments()[1]).getIds();
+                log.debug("getExecutorsToGetTasks: Escalation executors id from log :" + ids);
+                if (ids.contains(actor.getId()) && (!hasActiveActorInGroup(ids))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     protected boolean isTaskAcceptableBySubstitutionRules(ExecutionContext executionContext, Task task, Actor assignedActor, Actor substitutorActor) {
