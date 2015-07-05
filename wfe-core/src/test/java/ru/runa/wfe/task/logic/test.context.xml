@@ -37,4 +37,6 @@
        
        <bean id="batchPresentationCompilerFactory" factory-bean="mockFactoryBean" factory-method="createMockBatchPresentationCompilerFactory" />
        
+       <bean id="processLogDAO" factory-bean="mockFactoryBean" factory-method="createMockProcessLogDAO" />
+       
 </beans>

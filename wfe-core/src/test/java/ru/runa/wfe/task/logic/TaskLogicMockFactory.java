@@ -1,5 +1,7 @@
 package ru.runa.wfe.task.logic;
 
+import ru.runa.wfe.audit.ProcessLog;
+import ru.runa.wfe.audit.dao.IProcessLogDAO;
 import ru.runa.wfe.commons.dao.IGenericDAO;
 import ru.runa.wfe.definition.dao.IProcessDefinitionLoader;
 import ru.runa.wfe.execution.IExecutorContextFactory;
@@ -42,6 +44,11 @@ public class TaskLogicMockFactory {
     }
 
     public IBatchPresentationCompilerFactory<?> createMockBatchPresentationCompilerFactory() {
+        /* TODO: implement */
+        return null;
+    }
+
+    public IProcessLogDAO<ProcessLog> createMockProcessLogDAO() {
         /* TODO: implement */
         return null;
     }
