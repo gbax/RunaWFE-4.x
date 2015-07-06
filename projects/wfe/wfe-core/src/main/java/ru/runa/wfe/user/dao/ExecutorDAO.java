@@ -42,7 +42,6 @@ import ru.runa.wfe.user.ExecutorAlreadyExistsException;
 import ru.runa.wfe.user.ExecutorDoesNotExistException;
 import ru.runa.wfe.user.ExecutorGroupMembership;
 import ru.runa.wfe.user.Group;
-import ru.runa.wfe.user.IExecutorLoader;
 import ru.runa.wfe.user.TemporaryGroup;
 import ru.runa.wfe.user.cache.ExecutorCache;
 import ru.runa.wfe.user.cache.ExecutorCacheCtrl;
@@ -59,7 +58,7 @@ import com.google.common.collect.Maps;
  * @since 2.0
  */
 @SuppressWarnings("unchecked")
-public class ExecutorDAO extends CommonDAO implements IExecutorLoader {
+public class ExecutorDAO extends CommonDAO implements IExecutorDAO {
     private final ExecutorCache executorCache = ExecutorCacheCtrl.getInstance();
     private static final String NAME_PROPERTY_NAME = "name";
     private static final String ID_PROPERTY_NAME = "id";
@@ -126,14 +125,7 @@ public class ExecutorDAO extends CommonDAO implements IExecutorLoader {
         return getExecutor(Executor.class, id);
     }
 
-    /**
-     * Load {@linkplain Actor} by name. Throws exception if load is impossible,
-     * or exist group with same name.
-     * 
-     * @param name
-     *            Loaded actor name.
-     * @return {@linkplain Actor} with specified name.
-     */
+    @Override
     public Actor getActor(String name) {
         return getExecutor(Actor.class, name);
     }
@@ -161,14 +153,7 @@ public class ExecutorDAO extends CommonDAO implements IExecutorLoader {
         });
     }
 
-    /**
-     * Load {@linkplain Actor} by identity. Throws exception if load is
-     * impossible, or exist group with same identity.
-     * 
-     * @param name
-     *            Loaded actor identity.
-     * @return {@linkplain Actor} with specified identity.
-     */
+    @Override
     public Actor getActor(Long id) {
         return getExecutor(Actor.class, id);
     }
@@ -598,17 +583,7 @@ public class ExecutorDAO extends CommonDAO implements IExecutorLoader {
         return findFirstOrNull("from ExecutorGroupMembership where group=? and executor=?", group, executor);
     }
 
-    /**
-     * Returns all {@linkplain Actor}s from {@linkplain Group} recursively. All
-     * actors from subgroups is also added to result. For example G1 contains G2
-     * and A3, G2 contains A1 and A2. In this case:</br>
-     * <code> getGroupActors(G2) == {A1, A2}</code><br/>
-     * <code> getGroupActors(G1) == {A1, A2, A3} </code>
-     * 
-     * @param group
-     *            {@linkplain Group} to load {@linkplain Actor} children's
-     * @return Set of actor children's.
-     */
+    @Override
     public Set<Actor> getGroupActors(Group group) {
         Set<Actor> result = executorCache.getGroupActorsAll(group);
         if (result == null) {
@@ -617,16 +592,7 @@ public class ExecutorDAO extends CommonDAO implements IExecutorLoader {
         return result;
     }
 
-    /**
-     * Returns all executor parent {@linkplain Groups}s recursively. For example
-     * G1 contains G2 and A3, G2 contains A1 and A2. In this case:</br>
-     * <code> getExecutorParentsAll(A1) == {G1, G2}</code><br/>
-     * <code> getExecutorParentsAll(A3) == {G1} </code>
-     * 
-     * @param executor
-     *            {@linkplain Executor} to load parent groups.
-     * @return Set of executor parents.
-     */
+    @Override
     public Set<Group> getExecutorParentsAll(Executor executor) {
         return getExecutorGroupsAll(executor, new HashSet<Executor>());
     }

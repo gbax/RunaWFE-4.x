@@ -35,7 +35,7 @@ import com.google.common.collect.Lists;
 /**
  * Creates {@link Query} to load data according to {@link BatchPresentation}.
  */
-public class BatchPresentationHibernateCompiler {
+public class BatchPresentationHibernateCompiler<T extends Object> implements IBatchPresentationCompiler<T> {
 
     /**
      * {@link BatchPresentation}, used to load data.
@@ -58,12 +58,9 @@ public class BatchPresentationHibernateCompiler {
         this.batchPresentation = batchPresentation;
     }
 
-    /**
-     * Creates query to load data according to {@link BatchPresentation}.
-     * 
-     * @return {@link Query} to load data.
-     */
-    public <T extends Object> List<T> getBatch() {
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<T> getBatch() {
         return getBatchQuery(new HibernateCompilerParameters(parameters, false)).list();
     }
 
@@ -77,34 +74,16 @@ public class BatchPresentationHibernateCompiler {
         return number.intValue();
     }
 
-    /**
-     * Creates query to load data according to {@link BatchPresentation}.
-     * 
-     * @param enablePaging
-     *            Flag, equals true, if paging must be used in query; false
-     *            otherwise.
-     * @return {@link Query} to load data.
-     */
-    public <T extends Object> List<T> getBatch(boolean enablePaging) {
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<T> getBatch(boolean enablePaging) {
         parameters = new HibernateCompilerParameters(null, null, enablePaging, false, null);
         return getBatchQuery(parameters).list();
     }
 
-    /**
-     * Creates query to load data according to {@link BatchPresentation}.
-     * Restrictions may not be set (if null).
-     * 
-     * @param owners
-     *            Collection of owners id (Long for example).
-     * @param ownersDBPath
-     *            HQL path from root object to calculate object owner (actorId
-     *            for {@link Task} for example).
-     * @param enablePaging
-     *            Flag, equals true, if paging must be used in query; false
-     *            otherwise.
-     * @return {@link Query} to load data.
-     */
-    public <T extends Object> List<T> getBatch(Collection<?> owners, String ownersDBPath, boolean enablePaging) {
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<T> getBatch(Collection<?> owners, String ownersDBPath, boolean enablePaging) {
         parameters = new HibernateCompilerParameters(owners, ownersDBPath, enablePaging, false, null);
         return getBatchQuery(parameters).list();
     }
@@ -123,23 +102,9 @@ public class BatchPresentationHibernateCompiler {
         return getBatchQuery(parameters).list();
     }
 
-    /**
-     * Creates query to load data according to {@link BatchPresentation} with
-     * owners and permission restriction.
-     * 
-     * @param enablePaging
-     *            Flag, equals true, if paging must be used in query; false
-     *            otherwise.
-     * @param user
-     *            User which must has permission on queried objects.
-     * @param permission
-     *            Permission, which at least one executors must has on queried
-     *            objects.
-     * @param securedObjectTypes
-     *            Type of secured object for queried objects.
-     * @return {@link Query} to load data.
-     */
-    public <T extends Object> List<T> getBatch(boolean enablePaging, User user, Permission permission, SecuredObjectType[] securedObjectTypes) {
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<T> getBatch(boolean enablePaging, User user, Permission permission, SecuredObjectType[] securedObjectTypes) {
         parameters = new HibernateCompilerParameters(null, null, enablePaging, false, user, permission, securedObjectTypes, null, null);
         return getBatchQuery(parameters).list();
     }
@@ -163,18 +128,9 @@ public class BatchPresentationHibernateCompiler {
         return number.intValue();
     }
 
-    /**
-     * Creates query to load data according to {@link BatchPresentation}.
-     * Restrictions may not be set (if null).
-     * 
-     * @param concretteClass
-     *            Subclass of root persistent class to be loaded by query.
-     * @param enablePaging
-     *            Flag, equals true, if paging must be used in query; false
-     *            otherwise.
-     * @return {@link Query} to load data.
-     */
-    public <T extends Object> List<T> getBatch(Class<T> concretteClass, boolean enablePaging) {
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<T> getBatch(Class<T> concretteClass, boolean enablePaging) {
         parameters = new HibernateCompilerParameters(null, null, enablePaging, false, concretteClass);
         return getBatchQuery(parameters).list();
     }

@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
  *            entity class
  */
 @SuppressWarnings("unchecked")
-public abstract class GenericDAO<T extends Object> extends CommonDAO {
+public abstract class GenericDAO<T extends Object> extends CommonDAO implements IGenericDAO<T> {
     protected static final Log log = LogFactory.getLog(GenericDAO.class);
     private final Class<T> entityClass;
 
@@ -32,11 +32,7 @@ public abstract class GenericDAO<T extends Object> extends CommonDAO {
         entityClass = (Class<T>) pt.getActualTypeArguments()[0];
     }
 
-    /**
-     * Load entity from database by id.
-     * 
-     * @return entity or <code>null</code> if no entity found.
-     */
+    @Override
     public T get(Long id) {
         Preconditions.checkArgument(id != null);
         return get(entityClass, id);
@@ -90,8 +86,8 @@ public abstract class GenericDAO<T extends Object> extends CommonDAO {
      * @return first entity from list or <code>null</code>
      */
     @Override
-    protected T findFirstOrNull(String hql, Object... parameters) { 
-        List<T> list = (List<T>) getHibernateTemplate().find(hql, parameters);
+    protected T findFirstOrNull(String hql, Object... parameters) {
+        List<T> list = getHibernateTemplate().find(hql, parameters);
         return getFirstOrNull(list);
     }
 

@@ -44,7 +44,7 @@ import com.google.common.base.Objects;
  * @author Dofs
  * @since 4.0
  */
-public class WfTaskFactory {
+public class WfTaskFactory implements IWfTaskFactory {
     @Autowired
     private ProcessDefinitionLoader processDefinitionLoader;
     @Autowired
@@ -59,6 +59,7 @@ public class WfTaskFactory {
      *            can be <code>null</code>
      * @return
      */
+    @Override
     public WfTask create(Task task, Actor targetActor, boolean acquiredBySubstitution, List<String> variableNamesToInclude) {
         return create(task, targetActor, acquiredBySubstitution, variableNamesToInclude, !task.getOpenedByExecutorIds().contains(targetActor.getId()));
     }
@@ -73,6 +74,7 @@ public class WfTaskFactory {
      * @param firstOpen
      * @return
      */
+    @Override
     public WfTask create(Task task, Actor targetActor, boolean acquiredBySubstitution, List<String> variableNamesToInclude, boolean firstOpen) {
         Process process = task.getProcess();
         Deployment deployment = process.getDeployment();
