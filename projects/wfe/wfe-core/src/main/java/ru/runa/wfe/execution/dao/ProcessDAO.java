@@ -58,7 +58,7 @@ public class ProcessDAO extends GenericDAO<Process> {
                     parameters.put("definitionName", filter.getDefinitionName());
                 }
                 if (filter.getDefinitionVersion() != null) {
-                    conditions.add("definition.version = :definitionVersion");
+                    conditions.add("deployment.version = :definitionVersion");
                     parameters.put("definitionVersion", filter.getDefinitionVersion());
                 }
                 if (filter.getId() != null) {
