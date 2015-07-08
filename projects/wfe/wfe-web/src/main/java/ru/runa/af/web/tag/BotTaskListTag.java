@@ -164,35 +164,36 @@ public class BotTaskListTag extends TitledFormTag {
             return tr;
         }
 
-		private TD buildComplexTD(BotTask task){            		        
-			Table table = new Table();
-			table.setClass(Resources.CLASS_LIST_TABLE);
-			table.setWidth("100%");
-		    
-		    TR nameTr = new TR();
-		    nameTr.addElement(new TD(Messages.getMessage(Messages.LABEL_BOT_TASK_NAME, pageContext)).setClass(Resources.CLASS_LIST_TABLE_TD));
-		    nameTr.addElement(buildNameTD(task));
-		    table.addElement(nameTr);
-		
-		    TR handlerTr = new TR();
-		    handlerTr.addElement(new TD(Messages.getMessage(Messages.LABEL_BOT_TASK_HANDLER, pageContext)).setClass(Resources.CLASS_LIST_TABLE_TD));
-		    handlerTr.addElement(buildHandlerTD(task));
-		    table.addElement(handlerTr);
-		
-		    TR configTr = new TR();
-		    configTr.addElement(new TD(Messages.getMessage(Messages.LABEL_BOT_TASK_CONFIG, pageContext)).setClass(Resources.CLASS_LIST_TABLE_TD));
-		    configTr.addElement(buildConfigurationUploadTD(task));
-		    table.addElement(configTr);
-		
-		    TD resTD = new TD();
-		    resTD.addElement(table);
-		    return resTD;
-		}
-        
+        private TD buildComplexTD(BotTask task) {
+            Table table = new Table();
+            table.setClass(Resources.CLASS_LIST_TABLE);
+            table.setWidth("100%");
+
+            TR nameTr = new TR();
+            nameTr.addElement(new TD(Messages.getMessage(Messages.LABEL_BOT_TASK_NAME, pageContext)).setClass(Resources.CLASS_LIST_TABLE_TD));
+            nameTr.addElement(buildNameTD(task));
+            table.addElement(nameTr);
+
+            TR handlerTr = new TR();
+            handlerTr.addElement(new TD(Messages.getMessage(Messages.LABEL_BOT_TASK_HANDLER, pageContext)).setClass(Resources.CLASS_LIST_TABLE_TD));
+            handlerTr.addElement(buildHandlerTD(task));
+            table.addElement(handlerTr);
+
+            TR configTr = new TR();
+            configTr.addElement(new TD(Messages.getMessage(Messages.LABEL_BOT_TASK_CONFIG, pageContext)).setClass(Resources.CLASS_LIST_TABLE_TD));
+            configTr.addElement(buildConfigurationUploadTD(task));
+            table.addElement(configTr);
+
+            TD resTD = new TD();
+            resTD.addElement(table);
+            return resTD;
+        }
+
         private TD buildNameTD(BotTask task) {
             TD resTD = new TD();
             resTD.setClass(Resources.CLASS_LIST_TABLE_TD);
-            Input input = new Input(Input.TEXT, BotTasksForm.BOT_TASK_INPUT_NAME_PREFIX + task.getId() + BotTasksForm.NAME_INPUT_NAME, task.getName());
+            Input input = new Input(Input.TEXT, BotTasksForm.BOT_TASK_INPUT_NAME_PREFIX + task.getId() + BotTasksForm.NAME_INPUT_NAME,
+                    task.getName());
             input.setDisabled(disabled);
             input.setSize(nameSize);
             resTD.addElement(input);
@@ -286,8 +287,8 @@ public class BotTaskListTag extends TitledFormTag {
             jsLink.append(Commons.getActionUrl(BotTaskConfigurationDownloadAction.DOWNLOAD_BOT_TASK_CONFIGURATION_ACTION_PATH, parameterMap,
                     pageContext, PortletUrlType.Action));
             jsLink.append("','");
-            jsLink.append(Commons.getActionUrl(UpdateBotTaskConfigurationAction.UPDATE_TASK_HANDLER_CONF_ACTION_PATH, "id", task.getId(),
-                    pageContext, PortletUrlType.Action));
+            jsLink.append(Commons.getActionUrl(UpdateBotTaskConfigurationAction.UPDATE_TASK_HANDLER_CONF_ACTION_PATH, "id", task.getId(), pageContext,
+                    PortletUrlType.Action));
             jsLink.append("','");
             jsLink.append(Messages.getMessage(Messages.BUTTON_SAVE, pageContext));
             jsLink.append("','");
