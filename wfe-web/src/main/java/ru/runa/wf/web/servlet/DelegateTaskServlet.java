@@ -91,7 +91,7 @@ public class DelegateTaskServlet extends HttpServlet {
             // temporary group
             String groupName = "delegateTaskGroup_" + user.getActor().getId().toString() + "_" + currentOwner.getId().toString() + "_"
                     + taskId.toString();
-            TemporaryGroup tempGroup = TemporaryGroup.create(groupName, "Autocreated by delegate task servlet");
+            TemporaryGroup tempGroup = TemporaryGroup.create(task.getProcessId(), groupName, "Autocreated by delegate task servlet");
             tempGroup = Delegates.getExecutorService().create(user, tempGroup);
             List<Long> executorIdList = Lists.newArrayList(executors);
             Delegates.getExecutorService().addExecutorsToGroup(user, executorIdList, tempGroup.getId());
