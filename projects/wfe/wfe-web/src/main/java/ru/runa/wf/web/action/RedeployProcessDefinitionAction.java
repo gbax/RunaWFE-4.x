@@ -52,10 +52,14 @@ public class RedeployProcessDefinitionAction extends BaseDeployProcessDefinition
     private Long definitionId;
 
     @Override
-    protected void doAction(User user, FileForm fileForm, List<String> processType) throws IOException {
+    protected void doAction(User user, FileForm fileForm, List<String> processType, boolean isUpdateCurrentVersion) throws IOException {
         WfDefinition definition = Delegates.getDefinitionService().getProcessDefinition(user, fileForm.getId());
         byte[] data = Strings.isNullOrEmpty(fileForm.getFile().getFileName()) ? null : fileForm.getFile().getFileData();
-        definition = Delegates.getDefinitionService().redeployProcessDefinition(user, fileForm.getId(), data, processType);
+        if (isUpdateCurrentVersion) {
+            definition = Delegates.getDefinitionService().updateProcessDefinition(user, fileForm.getId(), data);
+        } else {
+            definition = Delegates.getDefinitionService().redeployProcessDefinition(user, fileForm.getId(), data, processType);
+        }
         definitionId = definition.getId();
     }
 

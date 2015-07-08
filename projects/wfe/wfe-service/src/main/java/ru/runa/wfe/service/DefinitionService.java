@@ -78,6 +78,24 @@ public interface DefinitionService {
             throws DefinitionDoesNotExistException, DefinitionArchiveFormatException, DefinitionNameMismatchException;
 
     /**
+     * Updates process definition.
+     * 
+     * @param user
+     *            authorized user
+     * @param definitionId
+     *            process definition id
+     * @param archive
+     *            process definition archive (ZIP format)
+     * @return redeployed definition
+     * 
+     * @throws DefinitionDoesNotExistException
+     * @throws DefinitionArchiveFormatException
+     * @throws DefinitionNameMismatchException
+     */
+    public WfDefinition updateProcessDefinition(User user, Long definitionId, byte[] archive) throws DefinitionDoesNotExistException,
+            DefinitionArchiveFormatException, DefinitionNameMismatchException;
+
+    /**
      * Gets only last version from each process definition.
      *
      * @param user

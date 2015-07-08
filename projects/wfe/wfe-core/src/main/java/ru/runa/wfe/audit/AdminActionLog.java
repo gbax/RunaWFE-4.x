@@ -12,7 +12,8 @@ import ru.runa.wfe.user.Actor;
 public class AdminActionLog extends ProcessLog {
     private static final long serialVersionUID = 1L;
     public static final String ACTION_UPDATE_VARIABLES = "update_variables";
-    public static final String ACTION_UPGRADE_PROCESS_TO_NEXT_VERSION = "upgrate_to_next_version";
+    public static final String ACTION_UPGRADE_PROCESS_TO_NEXT_VERSION = "upgrade_to_next_version";
+    public static final String ACTION_UPGRADE_CURRENT_PROCESS_VERSION = "upgrade_current_process_version";
 
     public AdminActionLog() {
     }

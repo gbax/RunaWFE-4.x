@@ -40,19 +40,26 @@ import com.google.common.collect.Lists;
  * Created on 14.10.2004
  * 
  */
-abstract class BaseDeployProcessDefinitionAction extends ActionBase {
+public abstract class BaseDeployProcessDefinitionAction extends ActionBase {
+    
+    public static final String TYPE_TYPE = "type";
+    public static final String TYPE_SEL = "typeSel";
+    public static final String TYPE_ATTRIBUTES = "TypeAttributes";
+    public static final String TYPE_DEFAULT = "_default_type_";
+    public static final String TYPE_UPDATE_CURRENT_VERSION = "updateCurrentVersion";
 
-    protected abstract void doAction(User user, FileForm fileForm, List<String> processType) throws Exception;
+    protected abstract void doAction(User user, FileForm fileForm, List<String> processType, boolean isUpdateCurrentVersion) throws Exception;
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-        String paramType = request.getParameter("type");
-        String paramTypeSelected = request.getParameter("typeSel");
-
+        String paramType = request.getParameter(TYPE_TYPE);
+        String paramTypeSelected = request.getParameter(TYPE_SEL);
+        boolean isUpdateCurrentVersion = (request.getParameter(TYPE_UPDATE_CURRENT_VERSION) != null);
+        
         Map<String, String> typeParamsHolder = new HashMap<String, String>();
-        typeParamsHolder.put("type", paramType);
-        typeParamsHolder.put("typeSel", paramTypeSelected);
-        request.setAttribute("TypeAttributes", typeParamsHolder);
+        typeParamsHolder.put(TYPE_TYPE, paramType);
+        typeParamsHolder.put(TYPE_SEL, paramTypeSelected);
+        request.setAttribute(TYPE_ATTRIBUTES, typeParamsHolder);
 
         List<String> fullType;
 
@@ -60,8 +67,8 @@ abstract class BaseDeployProcessDefinitionAction extends ActionBase {
         prepare(fileForm);
         try {
             ProcessTypesIterator iter = new ProcessTypesIterator(getLoggedUser(request));
-            if (paramTypeSelected == null || paramTypeSelected.equals("_default_type_")) {
-                if (paramType == null || paramType.length() == 0) {
+            if (paramTypeSelected == null || paramTypeSelected.equals(TYPE_DEFAULT)) {
+                if (Strings.isNullOrEmpty(paramType)) {
                     throw new ProcessDefinitionTypeNotPresentException();
                 }
                 fullType = Lists.newArrayList(paramType);
@@ -72,7 +79,7 @@ abstract class BaseDeployProcessDefinitionAction extends ActionBase {
                     fullType.add(paramType);
                 }
             }
-            doAction(getLoggedUser(request), fileForm, fullType);
+            doAction(getLoggedUser(request), fileForm, fullType, isUpdateCurrentVersion);
         } catch (Exception e) {
             addError(request, e);
             return getErrorForward(mapping);

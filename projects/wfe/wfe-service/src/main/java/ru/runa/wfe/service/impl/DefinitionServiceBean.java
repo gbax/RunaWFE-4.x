@@ -84,6 +84,15 @@ public class DefinitionServiceBean implements DefinitionServiceLocal, Definition
 
     @Override
     @WebResult(name = "result")
+    public WfDefinition updateProcessDefinition(@WebParam(name = "user") User user, @WebParam(name = "processId") Long processId,
+            @WebParam(name = "processArchive") byte[] processArchive) {
+        Preconditions.checkArgument(user != null);
+        Preconditions.checkArgument(processArchive != null);
+        return definitionLogic.updateProcessDefinition(user, processId, processArchive);
+    }
+
+    @Override
+    @WebResult(name = "result")
     public WfDefinition getLatestProcessDefinition(@WebParam(name = "user") User user, @WebParam(name = "definitionName") String definitionName) {
         Preconditions.checkArgument(user != null);
         Preconditions.checkArgument(definitionName != null);

@@ -57,7 +57,7 @@ public class DeploymentDAO extends GenericDAO<Deployment> {
             // start from 1
             deployment.setVersion(1L);
         }
-        getHibernateTemplate().save(deployment);
+        create(deployment);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class DeploymentDAO extends GenericDAO<Deployment> {
      */
     public List<Deployment> findLatestDeployments() {
         Map<String, Deployment> deploymentsByName = new HashMap<String, Deployment>();
-        List<Deployment> allProcessDeployments = (List<Deployment>) getHibernateTemplate().find("from Deployment order by name, version desc");
+        List<Deployment> allProcessDeployments = getHibernateTemplate().find("from Deployment order by name, version desc");
         // TODO performance?
         for (Deployment deployment : allProcessDeployments) {
             String processDefinitionName = deployment.getName();
@@ -110,7 +110,7 @@ public class DeploymentDAO extends GenericDAO<Deployment> {
      * given name, ordered by version (descending).
      */
     public List<Deployment> findAllDeploymentVersions(String name) {
-        return (List<Deployment>) getHibernateTemplate().find("from Deployment where name=? order by version desc", name);
+        return getHibernateTemplate().find("from Deployment where name=? order by version desc", name);
     }
 
 }

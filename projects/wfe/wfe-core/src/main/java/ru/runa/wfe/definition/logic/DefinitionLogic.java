@@ -23,7 +23,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import ru.runa.wfe.InternalApplicationException;
+import ru.runa.wfe.audit.AdminActionLog;
 import ru.runa.wfe.audit.ProcessDefinitionDeleteLog;
+import ru.runa.wfe.audit.ProcessDefinitionUpdateLog;
 import ru.runa.wfe.commons.logic.WFCommonLogic;
 import ru.runa.wfe.definition.DefinitionAlreadyExistException;
 import ru.runa.wfe.definition.DefinitionArchiveFormatException;
@@ -52,6 +55,7 @@ import ru.runa.wfe.task.Task;
 import ru.runa.wfe.user.User;
 import ru.runa.wfe.var.VariableDefinition;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
@@ -108,6 +112,67 @@ public class DefinitionLogic extends WFCommonLogic {
         deploymentDAO.deploy(definition.getDeployment(), oldDeployment);
         log.debug("Process definition " + oldDeployment + " was successfully redeployed");
         return new WfDefinition(definition, true);
+    }
+
+    /**
+     * Updates process definition.
+     * 
+     * @param user
+     * @param definitionId
+     * @param processArchiveBytes
+     * @param processType
+     * @return
+     */
+    public WfDefinition updateProcessDefinition(User user, Long definitionId, byte[] processArchiveBytes) {
+
+        Preconditions.checkNotNull(processArchiveBytes, "processArchiveBytes is required!");
+
+        Deployment updatingDeployment = deploymentDAO.getNotNull(definitionId);
+        checkPermissionAllowed(user, updatingDeployment, DefinitionPermission.REDEPLOY_DEFINITION);
+
+        ProcessDefinition definition;
+        try {
+            definition = parseProcessDefinition(processArchiveBytes);
+        } catch (Exception e) {
+            throw new DefinitionArchiveFormatException(e);
+        }
+
+        if (!updatingDeployment.getName().equals(definition.getName())) {
+            throw new DefinitionNameMismatchException("Expected definition name " + updatingDeployment.getName(), definition.getName(),
+                    updatingDeployment.getName());
+        }
+
+        ProcessDefinition latestDefinition = this.getLatestDefinition(updatingDeployment.getName());
+
+        if (!Objects.equal(latestDefinition.getId(), updatingDeployment.getId())) {
+            throw new InternalApplicationException("Only latest process definitions can be updated!");
+        }
+
+        definition.getDeployment().setId(updatingDeployment.getId());
+        definition.getDeployment().setCategory(updatingDeployment.getCategory());
+        definition.getDeployment().setVersion(updatingDeployment.getVersion());
+
+        deploymentDAO.update(definition.getDeployment()); // Does this really
+                                                          // correctly
+                                                          // resubstitutes
+                                                          // definitions for the
+                                                          // running processes?
+
+        addUpdatedDefinitionInProcessLog(user, definition);
+        systemLogDAO.create(new ProcessDefinitionUpdateLog(user.getActor().getId(), updatingDeployment.getName(), updatingDeployment.getVersion()));
+        log.debug("Process definition " + updatingDeployment + " was successfully updated");
+
+        return new WfDefinition(definition, true);
+    }
+
+    private void addUpdatedDefinitionInProcessLog(User user, ProcessDefinition definition) {
+        ProcessFilter filter = new ProcessFilter();
+        filter.setDefinitionName(definition.getName());
+        filter.setDefinitionVersion(definition.getDeployment().getVersion());
+        List<Process> processes = processDAO.getProcesses(filter);
+        for (Process process : processes) {
+            processLogDAO.addLog(new AdminActionLog(user.getActor(), AdminActionLog.ACTION_UPGRADE_PROCESS_TO_NEXT_VERSION), process, null);
+        }
     }
 
     public WfDefinition getLatestProcessDefinition(User user, String definitionName) {

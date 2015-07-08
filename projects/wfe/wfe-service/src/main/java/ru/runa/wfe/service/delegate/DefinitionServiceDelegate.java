@@ -62,6 +62,15 @@ public class DefinitionServiceDelegate extends EJB3Delegate implements Definitio
     }
 
     @Override
+    public WfDefinition updateProcessDefinition(User user, Long processId, byte[] processArchive) {
+        try {
+            return getDefinitionService().updateProcessDefinition(user, processId, processArchive);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
+    @Override
     public List<WfDefinition> getLatestProcessDefinitions(User user, BatchPresentation batchPresentation) {
         try {
             return getDefinitionService().getLatestProcessDefinitions(user, batchPresentation);
