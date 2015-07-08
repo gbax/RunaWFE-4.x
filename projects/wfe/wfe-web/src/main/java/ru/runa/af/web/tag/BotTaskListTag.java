@@ -32,6 +32,7 @@ import org.apache.ecs.html.Select;
 import org.apache.ecs.html.TD;
 import org.apache.ecs.html.TH;
 import org.apache.ecs.html.TR;
+import org.apache.ecs.html.Table;
 
 import ru.runa.af.web.Native2AsciiHelper;
 import ru.runa.af.web.action.BotTaskConfigurationDownloadAction;
@@ -125,9 +126,7 @@ public class BotTaskListTag extends TitledFormTag {
         public TR build() {
             TR tr = new TR();
             tr.addElement(new TH().setClass(Resources.CLASS_LIST_TABLE_TH));
-            tr.addElement(new TH(Messages.getMessage(Messages.LABEL_BOT_TASK_NAME, context)).setClass(Resources.CLASS_LIST_TABLE_TH));
-            tr.addElement(new TH(Messages.getMessage(Messages.LABEL_BOT_TASK_HANDLER, context)).setClass(Resources.CLASS_LIST_TABLE_TH));
-            tr.addElement(new TH(Messages.getMessage(Messages.LABEL_BOT_TASK_CONFIG, context)).setClass(Resources.CLASS_LIST_TABLE_TH));
+            tr.addElement(new TH(Messages.getMessage(Messages.LABEL_BOT_TASK_DETAILS, context)).setClass(Resources.CLASS_LIST_TABLE_TH));
             tr.addElement(new TH(Messages.getMessage(Messages.LABEL_BOT_TASK_SEQUENTIAL, context)).setClass(Resources.CLASS_LIST_TABLE_TH));
             return tr;
         }
@@ -160,13 +159,36 @@ public class BotTaskListTag extends TitledFormTag {
             TR tr = new TR();
             BotTask task = iterator.next();
             tr.addElement(buildCheckboxTD(task));
-            tr.addElement(buildNameTD(task));
-            tr.addElement(buildHandlerTD(task));
-            tr.addElement(buildConfigurationUploadTD(task));
+            tr.addElement(buildComplexTD(task));
             tr.addElement(buildSequentialTD(task));
             return tr;
         }
 
+		private TD buildComplexTD(BotTask task){            		        
+			Table table = new Table();
+			table.setClass(Resources.CLASS_LIST_TABLE);
+			table.setWidth("100%");
+		    
+		    TR nameTr = new TR();
+		    nameTr.addElement(new TD(Messages.getMessage(Messages.LABEL_BOT_TASK_NAME, pageContext)).setClass(Resources.CLASS_LIST_TABLE_TD));
+		    nameTr.addElement(buildNameTD(task));
+		    table.addElement(nameTr);
+		
+		    TR handlerTr = new TR();
+		    handlerTr.addElement(new TD(Messages.getMessage(Messages.LABEL_BOT_TASK_HANDLER, pageContext)).setClass(Resources.CLASS_LIST_TABLE_TD));
+		    handlerTr.addElement(buildHandlerTD(task));
+		    table.addElement(handlerTr);
+		
+		    TR configTr = new TR();
+		    configTr.addElement(new TD(Messages.getMessage(Messages.LABEL_BOT_TASK_CONFIG, pageContext)).setClass(Resources.CLASS_LIST_TABLE_TD));
+		    configTr.addElement(buildConfigurationUploadTD(task));
+		    table.addElement(configTr);
+		
+		    TD resTD = new TD();
+		    resTD.addElement(table);
+		    return resTD;
+		}
+        
         private TD buildNameTD(BotTask task) {
             TD resTD = new TD();
             resTD.setClass(Resources.CLASS_LIST_TABLE_TD);

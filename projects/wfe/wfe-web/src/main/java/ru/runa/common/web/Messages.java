@@ -242,6 +242,7 @@ public class Messages {
     public static final String LABEL_BOT_NAME = "label.bot_name";
     public static final String LABEL_BOT_SEQUENTIAL = "label.bot_sequential";
     // public static final String LABEL_BOT_TIMEOUT = "label.bot_timeout";
+    public static final String LABEL_BOT_TASK_DETAILS = "label.bot_task_details";    
     public static final String LABEL_BOT_TASK_NAME = "label.bot_task_name";
     public static final String LABEL_BOT_TASK_HANDLER = "label.bot_task_handler";
     public static final String LABEL_BOT_TASK_CONFIG = "label.bot_task_config";
