@@ -3,10 +3,12 @@ package ru.runa.gpd.lang;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 
+import ru.runa.gpd.Activator;
 import ru.runa.gpd.PluginLogger;
 import ru.runa.gpd.SharedImages;
 import ru.runa.gpd.editor.gef.GefEntry;
@@ -16,7 +18,10 @@ import ru.runa.gpd.lang.model.GraphElement;
 import ru.runa.gpd.lang.model.NamedGraphElement;
 import ru.runa.gpd.lang.model.StartState;
 import ru.runa.gpd.lang.model.Swimlane;
+import ru.runa.gpd.lang.model.TaskState;
 import ru.runa.gpd.ltk.VariableRenameProvider;
+import ru.runa.gpd.settings.LanguageElementPreferenceNode;
+import ru.runa.gpd.settings.PrefConstants;
 
 @SuppressWarnings("unchecked")
 public class NodeTypeDefinition {
@@ -44,7 +49,7 @@ public class NodeTypeDefinition {
         this.label = configElement.getAttribute("label");
         IConfigurationElement[] entries = configElement.getChildren("gef");
         if (entries.length > 0) {
-            gefEntry = new GefEntry(entries[0]);
+            gefEntry = new GefEntry(this, entries[0]);
         } else {
             gefEntry = null;
         }
@@ -117,6 +122,16 @@ public class NodeTypeDefinition {
         return graphitiEntry;
     }
 
+    public String getNamePattern(Language language) {
+        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+        String key = LanguageElementPreferenceNode.getId(this, language) + '.' + PrefConstants.P_LANGUAGE_NODE_NAME_PATTERN;
+        if (store.contains(key)) {
+            return store.getString(key);
+        } else {
+            return this.label;
+        }
+    }
+
     private <T> T createExecutableExtension(String propertyName) {
         try {
             if (element == null || element.getAttribute(propertyName) == null) {
@@ -137,13 +152,26 @@ public class NodeTypeDefinition {
             if (element instanceof Swimlane) {
                 name = element.getProcessDefinition().getNextSwimlaneName();
             } else {
-                name = getLabel();
+                name = getNamePattern(parent.getProcessDefinition().getLanguage());
                 if (!(element instanceof EndState) && !(element instanceof StartState)) {
                     name += " " + (parent.getChildren(element.getClass()).size() + 1);
                 }
             }
             if (element instanceof NamedGraphElement) {
                 ((NamedGraphElement) element).setName(name);
+            }
+            if (element instanceof TaskState) {
+                IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+                String key = LanguageElementPreferenceNode.getId(this, parent.getProcessDefinition().getLanguage()) + '.'
+                        + PrefConstants.P_LANGUAGE_SWIMLANE_INITIALIZER;
+                if (store.contains(key)) {
+                    ((TaskState) element).setReassignSwimlaneToInitializerValue(store.getBoolean(key));
+                }
+                key = LanguageElementPreferenceNode.getId(this, parent.getProcessDefinition().getLanguage()) + '.'
+                        + PrefConstants.P_LANGUAGE_SWIMLANE_PERFORMER;
+                if (store.contains(key)) {
+                    ((TaskState) element).setReassignSwimlaneToTaskPerformer(store.getBoolean(key));
+                }
             }
         }
         return (T) element;

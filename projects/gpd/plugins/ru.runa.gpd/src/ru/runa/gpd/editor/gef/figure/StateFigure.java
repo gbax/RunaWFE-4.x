@@ -15,11 +15,6 @@ public abstract class StateFigure<T extends Node> extends NodeFigure<T> {
     }
 
     @Override
-    public Dimension getDefaultSize() {
-        return DIM_RECTANGLE.getCopy();
-    }
-
-    @Override
     protected void paintFigure(Graphics g, Dimension dim) {
         Dimension border = dim.getExpanded(-1, -1);
         g.drawRoundRectangle(new Rectangle(new Point(0, 0), border), 20, 10);

@@ -1,34 +1,21 @@
 package ru.runa.gpd.editor.gef;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.EditPart;
 
-import ru.runa.gpd.PluginLogger;
+import ru.runa.gpd.editor.Entry;
 import ru.runa.gpd.editor.gef.figure.GridSupportLayer;
 import ru.runa.gpd.editor.gef.figure.NodeFigure;
 import ru.runa.gpd.editor.gef.figure.TransitionFigure;
+import ru.runa.gpd.lang.NodeTypeDefinition;
 import ru.runa.gpd.lang.model.GraphElement;
 import ru.runa.gpd.lang.model.ProcessDefinition;
 
-public class GefEntry {
-    private final IConfigurationElement element;
+public class GefEntry extends Entry {
 
-    public GefEntry(IConfigurationElement element) {
-        this.element = element;
-    }
-
-    private <T> T createExecutableExtension(String propertyName) {
-        try {
-            if (element == null || element.getAttribute(propertyName) == null) {
-                return null;
-            }
-            return (T) element.createExecutableExtension(propertyName);
-        } catch (CoreException e) {
-            PluginLogger.logError("Unable to create element '" + this + "'(unable to load property='" + propertyName + "')", e);
-            return null;
-        }
+    public GefEntry(NodeTypeDefinition nodeTypeDefinition, IConfigurationElement element) {
+        super(nodeTypeDefinition, element);
     }
 
     private EditPart createEditPart(String propertyName, GraphElement element) {

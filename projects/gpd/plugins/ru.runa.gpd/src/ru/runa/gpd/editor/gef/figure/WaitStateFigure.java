@@ -11,11 +11,6 @@ public class WaitStateFigure extends StateFigure {
     }
 
     @Override
-    public Dimension getDefaultSize() {
-        return DIM_RECTANGLE.getCopy();
-    }
-
-    @Override
     protected void paintFigure(Graphics g, Dimension dim) {
         super.paintFigure(g, dim);
         int offset = 5;

@@ -30,8 +30,6 @@ import ru.runa.gpd.lang.model.NamedGraphElement;
 import ru.runa.gpd.lang.model.SwimlanedNode;
 
 public abstract class NodeFigure<T extends GraphElement> extends Figure implements GEFConstants {
-    protected static final Dimension DIM_RECTANGLE = new Dimension(10 * GRID_SIZE, 6 * GRID_SIZE);
-    protected static final Dimension DIM_SLIM = new Dimension(16 * GRID_SIZE, 5);
     protected static final Color veryLightBlue = new Color(null, 246, 247, 255);
     protected static final Color lightBlue = new Color(null, 3, 104, 154);
     protected TextFlow swimlaneLabel;
@@ -72,7 +70,7 @@ public abstract class NodeFigure<T extends GraphElement> extends Figure implemen
     }
 
     public Dimension getDefaultSize() {
-        return DIM_RECTANGLE.getCopy();
+        return model.getTypeDefinition().getGefEntry().getDefaultSize().getCopy();
     }
 
     @Override

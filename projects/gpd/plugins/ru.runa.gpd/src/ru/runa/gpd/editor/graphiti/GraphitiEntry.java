@@ -1,15 +1,12 @@
 package ru.runa.gpd.editor.graphiti;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.ILayoutFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
 
-import ru.runa.gpd.PluginLogger;
-import ru.runa.gpd.editor.GEFConstants;
+import ru.runa.gpd.editor.Entry;
 import ru.runa.gpd.editor.graphiti.add.AddElementFeature;
 import ru.runa.gpd.editor.graphiti.add.AddTransitionFeature;
 import ru.runa.gpd.editor.graphiti.create.CreateElementFeature;
@@ -18,30 +15,10 @@ import ru.runa.gpd.editor.graphiti.layout.ElementLayoutFeature;
 import ru.runa.gpd.editor.graphiti.update.UpdateFeature;
 import ru.runa.gpd.lang.NodeTypeDefinition;
 
-public class GraphitiEntry {
-    private final NodeTypeDefinition nodeTypeDefinition;
-    private final IConfigurationElement element;
-    private final Dimension defaultSize;
-    private final boolean fixedSize;
+public class GraphitiEntry extends Entry {
 
     public GraphitiEntry(NodeTypeDefinition nodeTypeDefinition, IConfigurationElement element) {
-        this.nodeTypeDefinition = nodeTypeDefinition;
-        this.element = element;
-        this.defaultSize = new Dimension(GEFConstants.GRID_SIZE * Integer.parseInt(element.getAttribute("width")), GEFConstants.GRID_SIZE
-                * Integer.parseInt(element.getAttribute("height")));
-        this.fixedSize = Boolean.parseBoolean(element.getAttribute("fixedSize"));
-    }
-
-    private <T> T createExecutableExtension(String propertyName) {
-        try {
-            if (element == null || element.getAttribute(propertyName) == null) {
-                return null;
-            }
-            return (T) element.createExecutableExtension(propertyName);
-        } catch (CoreException e) {
-            PluginLogger.logError("Unable to create element '" + this + "'(unable to load property='" + propertyName + "')", e);
-            return null;
-        }
+        super(nodeTypeDefinition, element);
     }
 
     public IFeature createCreateFeature(DiagramFeatureProvider provider) {
@@ -85,11 +62,4 @@ public class GraphitiEntry {
         return feature;
     }
 
-    public Dimension getDefaultSize() {
-        return defaultSize.getCopy();
-    }
-
-    public boolean isFixedSize() {
-        return fixedSize;
-    }
 }

@@ -103,8 +103,9 @@ public abstract class Node extends NamedGraphElement implements Describable {
 
     public String getNextTransitionName() {
         int runner = 1;
+        String pattern = getTypeDefinition().getNamePattern(getProcessDefinition().getLanguage());
         while (true) {
-            String candidate = "tr" + runner;
+            String candidate = pattern + runner;
             if (getTransitionByName(candidate) == null) {
                 return candidate;
             }

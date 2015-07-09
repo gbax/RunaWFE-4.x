@@ -25,7 +25,7 @@ public class TaskStateFigure extends StateFigure<TaskState> {
 
     @Override
     public Dimension getDefaultSize() {
-        return DIM_RECTANGLE.getExpanded(GRID_SIZE, GRID_SIZE);
+        return super.getDefaultSize().getExpanded(GRID_SIZE, GRID_SIZE);
     }
 
     @Override

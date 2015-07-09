@@ -15,11 +15,6 @@ public class ForkJoinFigure extends NodeFigure {
     }
 
     @Override
-    public Dimension getDefaultSize() {
-        return DIM_SLIM.getCopy();
-    }
-
-    @Override
     public void setBounds(Rectangle rect) {
         if (rect.width < rect.height) {
             rect.width = 5;

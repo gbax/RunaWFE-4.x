@@ -543,7 +543,8 @@
          <gef
             figure="ru.runa.gpd.editor.gef.figure.TransitionFigure"
             graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.TransitionGraphicalEditPart"
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.TransitionTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.TransitionTreeEditPart"
+            fixedSize="false">
          </gef>
          <graphiti
                add="ru.runa.gpd.editor.graphiti.add.AddTransitionFeature"
@@ -604,7 +605,8 @@
             model="ru.runa.gpd.lang.model.Swimlane"
             type="artifact">
          <gef 
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.SwimlaneTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.SwimlaneTreeEditPart"
+            fixedSize="false">
          </gef>
          <graphiti
                add="ru.runa.gpd.editor.graphiti.add.AddSwimlaneFeature"
@@ -626,7 +628,8 @@
          <gef 
             figure="ru.runa.gpd.editor.gef.figure.StartStateFigure"
             graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.SwimlaneNodeEditPart"
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.StartStateTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.StartStateTreeEditPart"
+            fixedSize="true">
          </gef>
          <graphiti
                add="ru.runa.gpd.editor.graphiti.add.AddStartNodeFeature"
@@ -647,7 +650,8 @@
          <gef 
             figure="ru.runa.gpd.editor.gef.figure.TaskStateFigure"
             graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.TaskStateGraphicalEditPart"
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart"
+            fixedSize="false">
          </gef>
          <graphiti
                add="ru.runa.gpd.editor.graphiti.add.AddTaskStateNodeFeature"
@@ -669,7 +673,8 @@
          <gef 
             figure="ru.runa.gpd.editor.gef.figure.WaitStateFigure"
             graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.LabeledNodeGraphicalEditPart"
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart"
+            fixedSize="true">
          </gef>
          <graphiti
                add="ru.runa.gpd.editor.graphiti.add.AddTimerFeature"
@@ -688,7 +693,8 @@
          <gef 
             figure="ru.runa.gpd.editor.gef.figure.MultiTaskStateFigure"
             graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.TaskStateGraphicalEditPart"
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart"
+            fixedSize="false">
          </gef>
       </element>
       <element
@@ -700,7 +706,10 @@
          <gef 
             figure="ru.runa.gpd.editor.gef.figure.ForkJoinFigure"
             graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.NodeGraphicalEditPart"
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart"
+            fixedSize="true"
+			height="5"
+			width="16">
          </gef>
       </element>
       <element
@@ -712,7 +721,10 @@
          <gef 
             figure="ru.runa.gpd.editor.gef.figure.ForkJoinFigure"
             graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.NodeGraphicalEditPart"
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart"
+            fixedSize="true"
+			height="5"
+			width="16">
          </gef>
       </element>
       <element
@@ -724,7 +736,8 @@
          <gef
             figure="ru.runa.gpd.editor.gef.figure.DecisionFigure"
             graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.DecisionGraphicalEditPart"
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart"
+            fixedSize="false">
          </gef>
       </element>
       <element
@@ -736,7 +749,8 @@
          <gef
             figure="ru.runa.gpd.editor.gef.figure.ConjunctionFigure"
             graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.ConjunctionGraphicalEditPart"
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart"
+            fixedSize="true">
          </gef>
       </element>
       <element
@@ -776,7 +790,8 @@
          <gef 
             figure="ru.runa.gpd.editor.gef.figure.ActionFigure"
             graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.ActionGraphicalEditPart"
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.ActionTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.ActionTreeEditPart"
+            fixedSize="true">
          </gef>
       </element>
       <element
@@ -811,7 +826,8 @@
          <gef 
             figure="ru.runa.gpd.editor.gef.figure.SubprocessFigure"
             graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.SubprocessGraphicalEditPart"
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart"
+            fixedSize="false">
          </gef>
          <graphiti
                add="ru.runa.gpd.editor.graphiti.add.AddSubProcessFeature"
@@ -833,7 +849,8 @@
          <gef 
             figure="ru.runa.gpd.editor.gef.figure.MultiSubprocessFigure"
             graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.MultiInstanceGraphicalEditPart"
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart"
+            fixedSize="false">
          </gef>
          <graphiti
                add="ru.runa.gpd.editor.graphiti.add.AddMultiSubprocessFeature"
@@ -855,7 +872,8 @@
          <gef 
             figure="ru.runa.gpd.editor.gef.figure.SendMessageFigure"
             graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.SendMessageGraphicalEditPart"
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart"
+            fixedSize="true">
          </gef>
          <onVariableRenamed
                provider="ru.runa.gpd.ltk.MessagingNodeRenameProvider">
@@ -878,7 +896,8 @@
          <gef
             figure="ru.runa.gpd.editor.gef.figure.ReceiveMessageFigure"
             graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.ReceiveMessageGraphicalEditPart"
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart"
+            fixedSize="true">
          </gef>
          <onVariableRenamed
                provider="ru.runa.gpd.ltk.MessagingNodeRenameProvider">
@@ -928,7 +947,8 @@
          <gef
             figure="ru.runa.gpd.editor.gef.figure.EndTokenStateFigure"
             graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.LabeledNodeGraphicalEditPart"
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart"
+            fixedSize="true">
          </gef>
          <graphiti
                add="ru.runa.gpd.editor.graphiti.add.AddEndNodeFeature"
@@ -949,7 +969,8 @@
          <gef
             figure="ru.runa.gpd.editor.gef.figure.EndStateFigure"
             graphicalEditPart="ru.runa.gpd.editor.gef.part.graph.LabeledNodeGraphicalEditPart"
-            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart">
+            treeEditPart="ru.runa.gpd.editor.gef.part.tree.NodeTreeEditPart"
+            fixedSize="true">
          </gef>
          <graphiti
                add="ru.runa.gpd.editor.graphiti.add.AddEndNodeFeature"
@@ -1943,6 +1964,23 @@
              class="ru.runa.gpd.settings.LocalizationPreferencePage"
              id="gpd.pref.extensions.localization"
              name="%pref.extensions.localization">
+       </page>
+       <page
+			 class="ru.runa.gpd.settings.EmptyPreferencePage"
+             id="gpd.pref.language"
+             name="%pref.language">
+       </page>
+       <page
+             category="gpd.pref.language"
+             class="ru.runa.gpd.settings.EmptyPreferencePage"
+             id="gpd.pref.language.jpdl"
+             name="%pref.language.jpdl">
+       </page>
+       <page
+             category="gpd.pref.language"
+             class="ru.runa.gpd.settings.EmptyPreferencePage"
+             id="gpd.pref.language.bpmn"
+             name="%pref.language.bpmn">
        </page>
     </extension>
    <extension
