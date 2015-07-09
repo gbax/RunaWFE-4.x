@@ -263,17 +263,9 @@ public class ProcessDefinition extends NamedGraphElement implements Active, Desc
             boolean applicable = typeClassNameFilters == null || typeClassNameFilters.length == 0;
             if (!applicable) {
                 for (String typeClassNameFilter : typeClassNameFilters) {
-                    VariableUserType userType = getVariableUserType(typeClassNameFilter);
-                    if (userType != null) {
-                        if (Objects.equal(variable.getUserType(), userType)) {
-                            applicable = true;
-                            break;
-                        }
-                    } else {
-                        if (VariableFormatRegistry.isApplicable(variable, typeClassNameFilter)) {
-                            applicable = true;
-                            break;
-                        }
+                    if (VariableFormatRegistry.isApplicable(variable, typeClassNameFilter)) {
+                        applicable = true;
+                        break;
                     }
                 }
             }
