@@ -157,8 +157,7 @@ public class TaskListBuilder implements ITaskListBuilder {
         Set<Group> upperGroups = executorDAO.getExecutorParentsAll(actor);
         if (addOnlyInactiveGroups) {
             for (Group group : upperGroups) {
-                if ((group instanceof EscalationGroup)
-                    && (isActorInInactiveEscalationGroup(actor, (EscalationGroup)group))){
+                if ((group instanceof EscalationGroup) && (isActorInInactiveEscalationGroup(actor, (EscalationGroup) group))) {
                     executors.add(group);
                 } else {
                     if (!hasActiveActorInGroup(group)) {
@@ -173,25 +172,29 @@ public class TaskListBuilder implements ITaskListBuilder {
     }
 
     protected boolean isActorInInactiveEscalationGroup(Actor actor, EscalationGroup group) {
-        EscalationGroup currGroup = (EscalationGroup) group;
-        Executor originalExecutor = currGroup.getOriginalExecutor();
-        if ((originalExecutor instanceof Actor) && originalExecutor.getId().equals(actor.getId())
-                && (!((Actor) originalExecutor).isActive())) {
+        Executor originalExecutor = group.getOriginalExecutor();
+        if ((originalExecutor instanceof Actor) && originalExecutor.getId().equals(actor.getId()) && (!((Actor) originalExecutor).isActive())) {
             return true;
         }
         if ((originalExecutor instanceof Group) && executorDAO.getGroupActors((Group) originalExecutor).contains(actor)
                 && (!hasActiveActorInGroup((Group) originalExecutor))) {
             return true;
         }
-        List<ProcessLog> pLogs = processLogDAO.getAll(currGroup.getProcessId());
+        Long pid = group.getProcessId();
+        if (pid == null || pid <= 0) {
+            return false;
+        }
+        List<ProcessLog> pLogs = processLogDAO.getAll(group.getProcessId());
         for (ProcessLog pLog : pLogs) {
-            if (pLog instanceof TaskEscalationLog && pLog.getNodeId().equalsIgnoreCase(currGroup.getNodeId())) {
-                log.debug("getExecutorsToGetTasks: Escalation log was found.");
-                List<Long> ids = ((ExecutorIdsValue) pLog.getPatternArguments()[1]).getIds();
-                log.debug("getExecutorsToGetTasks: Escalation executors id from log :" + ids);
-                if (ids.contains(actor.getId()) && (!hasActiveActorInGroup(ids))) {
-                    return true;
-                }
+            String nid = group.getNodeId();
+            if (!(pLog instanceof TaskEscalationLog) || nid == null || !pLog.getNodeId().equalsIgnoreCase(nid)) {
+                continue;
+            }
+            log.debug(String.format("isActorInInactiveEscalationGroup: escalation log was found pid: %s nid: %s", pid, nid));
+            List<Long> ids = ((ExecutorIdsValue) pLog.getPatternArguments()[1]).getIds();
+            log.debug("isActorInInactiveEscalationGroup: escalation executors id from log :" + ids);
+            if (ids.contains(actor.getId()) && (!hasActiveActorInGroup(ids))) {
+                return true;
             }
         }
         return false;
