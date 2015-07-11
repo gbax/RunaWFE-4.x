@@ -47,6 +47,10 @@ public class TaskLogicMockFactory {
         reset(batchCompilerFactory);
         reset(logDAO);
 
+        if (dataset == null) {
+            return;
+        }
+
         dataset.mockRules(batchCompilerFactory);
         dataset.mockRules(exeContextFactory);
         dataset.mockRules(executorDAO);

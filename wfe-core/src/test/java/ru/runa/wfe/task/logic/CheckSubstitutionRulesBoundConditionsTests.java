@@ -38,10 +38,12 @@ public class CheckSubstitutionRulesBoundConditionsTests extends AbstractTestNGSp
         return new Object[][] { { "applies with one of DataAccessException testcase", new TestCaseDataSet() {
             @Override
             public void mockRules(IExecutorDAO executorDAO) {
-                when(executorDAO.getActor(new Long(1))).thenReturn(mock(Actor.class));
+                Actor actor = mock(Actor.class);
+                when(actor.isActive()).thenReturn(true);
+                when(executorDAO.getActor(new Long(1))).thenReturn(actor);
                 when(executorDAO.getActor(new Long(2))).thenThrow(mock(org.springframework.dao.DataAccessException.class));
-                when(executorDAO.getActor(new Long(3))).thenReturn(mock(Actor.class));
-                when(executorDAO.getActor(new Long(4))).thenReturn(mock(Actor.class));
+                when(executorDAO.getActor(new Long(3))).thenReturn(actor);
+                when(executorDAO.getActor(new Long(4))).thenReturn(actor);
             }
 
             @Override
@@ -59,10 +61,12 @@ public class CheckSubstitutionRulesBoundConditionsTests extends AbstractTestNGSp
         } }, { "applies with one of ExecutorDoesNotExistException testcase", new TestCaseDataSet() {
             @Override
             public void mockRules(IExecutorDAO executorDAO) {
-                when(executorDAO.getActor(new Long(1))).thenReturn(mock(Actor.class));
+                Actor actor = mock(Actor.class);
+                when(actor.isActive()).thenReturn(true);
+                when(executorDAO.getActor(new Long(1))).thenReturn(actor);
                 when(executorDAO.getActor(new Long(2))).thenThrow(mock(ExecutorDoesNotExistException.class));
-                when(executorDAO.getActor(new Long(3))).thenReturn(mock(Actor.class));
-                when(executorDAO.getActor(new Long(4))).thenReturn(mock(Actor.class));
+                when(executorDAO.getActor(new Long(3))).thenReturn(actor);
+                when(executorDAO.getActor(new Long(4))).thenReturn(actor);
             }
 
             @Override
@@ -85,9 +89,13 @@ public class CheckSubstitutionRulesBoundConditionsTests extends AbstractTestNGSp
 
         log.info(String.format("start test: %s", testName));
 
+        TaskLogicMockFactory.getFactory().setContextRules(testCase);
+
         int rules = taskListBuilder.checkSubstitutionRules(testCase.getCriteria(), testCase.getIds(), testCase.getExeContext(), testCase.getTask(),
                 testCase.getAssignedActor(), testCase.getSubstitutorActor());
 
         Assert.assertEquals(rules, TaskListBuilder.SUBSTITUTION_APPLIES);
+
+        TaskLogicMockFactory.getFactory().setContextRules(null);
     }
 }

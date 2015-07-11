@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 
 import ru.runa.wfe.audit.ProcessLog;
 import ru.runa.wfe.audit.TaskEscalationLog;
@@ -32,6 +33,7 @@ import ru.runa.wfe.task.dto.WfTask;
 import ru.runa.wfe.user.Actor;
 import ru.runa.wfe.user.EscalationGroup;
 import ru.runa.wfe.user.Executor;
+import ru.runa.wfe.user.ExecutorDoesNotExistException;
 import ru.runa.wfe.user.Group;
 import ru.runa.wfe.user.dao.IExecutorDAO;
 
@@ -228,7 +230,16 @@ public class TaskListBuilder implements ITaskListBuilder {
             Actor assignedActor, Actor substitutorActor) {
         int result = 0;
         for (Long actorId : ids) {
-            Actor actor = executorDAO.getActor(actorId);
+            Actor actor;
+            try {
+                actor = executorDAO.getActor(actorId);
+            } catch (DataAccessException e) {
+                log.warn(String.format("checkSubstitutionCriteriaRules: exception: %s on DAO-access with actorId: %s", e, actorId));
+                continue;
+            } catch (ExecutorDoesNotExistException e) {
+                log.warn(String.format("checkSubstitutionCriteriaRules: exception: %s on DAO-access with actorId: %s", e, actorId));
+                continue;
+            }
             if (actor.isActive() && criteriaIsSatisfied(criteria, executionContext, task, assignedActor, actor)) {
                 log.debug(String.format("checkSubstitutionCriteriaRules: to task: %s is applied %s", task, criteria));
                 result |= SUBSTITUTION_APPLIES;
