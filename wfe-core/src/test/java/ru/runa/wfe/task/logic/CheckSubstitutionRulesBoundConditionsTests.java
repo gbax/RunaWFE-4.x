@@ -1,6 +1,7 @@
 package ru.runa.wfe.task.logic;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -95,6 +96,102 @@ public class CheckSubstitutionRulesBoundConditionsTests extends AbstractTestNGSp
                 testCase.getAssignedActor(), testCase.getSubstitutorActor());
 
         Assert.assertEquals(rules, TaskListBuilder.SUBSTITUTION_APPLIES);
+
+        TaskLogicMockFactory.getFactory().setContextRules(null);
+    }
+
+    @DataProvider
+    public Object[][] getSuccessTestcases() {
+        return new Object[][] { { "applies testcase", TaskListBuilder.SUBSTITUTION_APPLIES, new TestCaseDataSet() {
+
+            Actor actor;
+
+            @Override
+            public void mockRules(IExecutorDAO executorDAO) {
+                actor = mock(Actor.class);
+                when(actor.isActive()).thenReturn(true);
+                when(executorDAO.getActor(new Long(1))).thenReturn(actor);
+            }
+
+            @Override
+            public SubstitutionCriteria getCriteria() {
+                SubstitutionCriteria criteria = mock(SubstitutionCriteria.class);
+                when(criteria.isSatisfied(any(ExecutionContext.class), any(Task.class), any(Actor.class), eq(actor))).thenReturn(true);
+                return criteria;
+            }
+
+            @Override
+            public Set<Long> getIds() {
+                return Sets.newHashSet(new Long(1));
+            }
+        } }, { "can substitute testcase", TaskListBuilder.CAN_I_SUBSTITUTE, new TestCaseDataSet() {
+
+            Actor actor;
+
+            @Override
+            public void mockRules(IExecutorDAO executorDAO) {
+                actor = mock(Actor.class);
+                when(executorDAO.getActor(new Long(1))).thenReturn(actor);
+            }
+
+            @Override
+            public SubstitutionCriteria getCriteria() {
+                SubstitutionCriteria criteria = mock(SubstitutionCriteria.class);
+                when(criteria.isSatisfied(any(ExecutionContext.class), any(Task.class), any(Actor.class), eq(actor))).thenReturn(true);
+                return criteria;
+            }
+
+            @Override
+            public Actor getSubstitutorActor() {
+                return actor;
+            }
+
+            @Override
+            public Set<Long> getIds() {
+                return Sets.newHashSet(new Long(1));
+            }
+
+        } }, { "applies and can substitute testcase", TaskListBuilder.SUBSTITUTION_APPLIES | TaskListBuilder.CAN_I_SUBSTITUTE, new TestCaseDataSet() {
+
+            Actor actor;
+
+            @Override
+            public void mockRules(IExecutorDAO executorDAO) {
+                actor = mock(Actor.class);
+                when(actor.isActive()).thenReturn(true);
+                when(executorDAO.getActor(new Long(1))).thenReturn(actor);
+            }
+
+            @Override
+            public SubstitutionCriteria getCriteria() {
+                SubstitutionCriteria criteria = mock(SubstitutionCriteria.class);
+                when(criteria.isSatisfied(any(ExecutionContext.class), any(Task.class), any(Actor.class), eq(actor))).thenReturn(true);
+                return criteria;
+            }
+
+            @Override
+            public Actor getSubstitutorActor() {
+                return actor;
+            }
+
+            @Override
+            public Set<Long> getIds() {
+                return Sets.newHashSet(new Long(1));
+            }
+        } } };
+    }
+
+    @Test(dataProvider = "getSuccessTestcases")
+    void successTests(String testName, int expected, TestCaseDataSet testCase) {
+
+        log.info(String.format("start test: %s", testName));
+
+        TaskLogicMockFactory.getFactory().setContextRules(testCase);
+
+        int rules = taskListBuilder.checkSubstitutionRules(testCase.getCriteria(), testCase.getIds(), testCase.getExeContext(), testCase.getTask(),
+                testCase.getAssignedActor(), testCase.getSubstitutorActor());
+
+        Assert.assertEquals(rules, expected);
 
         TaskLogicMockFactory.getFactory().setContextRules(null);
     }
