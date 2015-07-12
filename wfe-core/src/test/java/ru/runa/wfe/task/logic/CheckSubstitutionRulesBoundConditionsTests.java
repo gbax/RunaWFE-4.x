@@ -34,9 +34,9 @@ public class CheckSubstitutionRulesBoundConditionsTests extends AbstractTestNGSp
     @Autowired
     ITaskListBuilderTestProvider taskListBuilder;
 
-    @DataProvider
-    public Object[][] getExceptionsTestcases() {
-        return new Object[][] { { "applies with one of DataAccessException testcase", new TestCaseDataSet() {
+    @DataProvider(name = "testcases")
+    public Object[][] getTestcases() {
+        return new Object[][] { { "applies with one of DataAccessException testcase", TaskListBuilder.SUBSTITUTION_APPLIES, new TestCaseDataSet() {
             @Override
             public void mockRules(IExecutorDAO executorDAO) {
                 Actor actor = mock(Actor.class);
@@ -59,7 +59,7 @@ public class CheckSubstitutionRulesBoundConditionsTests extends AbstractTestNGSp
                 return Sets.newHashSet(new Long(1), new Long(2), new Long(3), new Long(4));
             }
 
-        } }, { "applies with one of ExecutorDoesNotExistException testcase", new TestCaseDataSet() {
+        } }, { "applies with one of ExecutorDoesNotExistException testcase", TaskListBuilder.SUBSTITUTION_APPLIES, new TestCaseDataSet() {
             @Override
             public void mockRules(IExecutorDAO executorDAO) {
                 Actor actor = mock(Actor.class);
@@ -82,27 +82,7 @@ public class CheckSubstitutionRulesBoundConditionsTests extends AbstractTestNGSp
                 return Sets.newHashSet(new Long(1), new Long(2), new Long(3), new Long(4));
             }
 
-        } } };
-    }
-
-    @Test(dataProvider = "getExceptionsTestcases")
-    void exceptionsTests(String testName, TestCaseDataSet testCase) {
-
-        log.info(String.format("start test: %s", testName));
-
-        TaskLogicMockFactory.getFactory().setContextRules(testCase);
-
-        int rules = taskListBuilder.checkSubstitutionRules(testCase.getCriteria(), testCase.getIds(), testCase.getExeContext(), testCase.getTask(),
-                testCase.getAssignedActor(), testCase.getSubstitutorActor());
-
-        Assert.assertEquals(rules, TaskListBuilder.SUBSTITUTION_APPLIES);
-
-        TaskLogicMockFactory.getFactory().setContextRules(null);
-    }
-
-    @DataProvider
-    public Object[][] getSuccessTestcases() {
-        return new Object[][] { { "applies testcase", TaskListBuilder.SUBSTITUTION_APPLIES, new TestCaseDataSet() {
+        } }, { "applies testcase", TaskListBuilder.SUBSTITUTION_APPLIES, new TestCaseDataSet() {
 
             Actor actor;
 
@@ -181,8 +161,8 @@ public class CheckSubstitutionRulesBoundConditionsTests extends AbstractTestNGSp
         } } };
     }
 
-    @Test(dataProvider = "getSuccessTestcases")
-    void successTests(String testName, int expected, TestCaseDataSet testCase) {
+    @Test(dataProvider = "testcases")
+    void runTests(String testName, int expected, TestCaseDataSet testCase) {
 
         log.info(String.format("start test: %s", testName));
 
