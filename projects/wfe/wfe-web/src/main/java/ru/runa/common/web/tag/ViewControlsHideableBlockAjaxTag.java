@@ -90,7 +90,6 @@ public class ViewControlsHideableBlockAjaxTag extends AbstractReturningTag {
 
             boolean contentVisible = BatchPresentationsVisibility.get(pageContext.getSession()).isBlockVisible(hideableBlockId);
             headerTD.addElement(Entities.NBSP);
-            headerTD.addElement(new Script("visibleBlock = " + contentVisible + ";"));
 
             String id = getHideableBlockId() + "Controls";
 
