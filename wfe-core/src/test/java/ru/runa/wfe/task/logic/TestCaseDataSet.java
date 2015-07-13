@@ -8,12 +8,14 @@ import ru.runa.wfe.commons.dao.IGenericDAO;
 import ru.runa.wfe.definition.dao.IProcessDefinitionLoader;
 import ru.runa.wfe.execution.ExecutionContext;
 import ru.runa.wfe.execution.IExecutorContextFactory;
+import ru.runa.wfe.presentation.BatchPresentation;
 import ru.runa.wfe.presentation.hibernate.IBatchPresentationCompilerFactory;
 import ru.runa.wfe.ss.SubstitutionCriteria;
 import ru.runa.wfe.ss.logic.ISubstitutionLogic;
 import ru.runa.wfe.task.Task;
 import ru.runa.wfe.task.dto.IWfTaskFactory;
 import ru.runa.wfe.user.Actor;
+import ru.runa.wfe.user.Executor;
 import ru.runa.wfe.user.dao.IExecutorDAO;
 
 public abstract class TestCaseDataSet implements ITestCaseDataSet {
@@ -90,6 +92,16 @@ public abstract class TestCaseDataSet implements ITestCaseDataSet {
 
     @Override
     public Actor getSubstitutorActor() {
+        return null;
+    }
+
+    @Override
+    public BatchPresentation getBatchPresentation() {
+        return null;
+    }
+
+    @Override
+    public Set<Executor> getExecutorsToGetTasksByMembership() {
         return null;
     }
 }

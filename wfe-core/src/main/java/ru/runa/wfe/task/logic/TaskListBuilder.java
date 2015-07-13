@@ -16,6 +16,7 @@ import ru.runa.wfe.audit.TaskEscalationLog;
 import ru.runa.wfe.audit.dao.IProcessLogDAO;
 import ru.runa.wfe.audit.presentation.ExecutorIdsValue;
 import ru.runa.wfe.commons.dao.IGenericDAO;
+import ru.runa.wfe.definition.DefinitionDoesNotExistException;
 import ru.runa.wfe.definition.dao.IProcessDefinitionLoader;
 import ru.runa.wfe.execution.ExecutionContext;
 import ru.runa.wfe.execution.IExecutorContextFactory;
@@ -112,7 +113,13 @@ public class TaskListBuilder implements ITaskListBuilder {
 
     protected WfTask getAcceptableTask(Task task, Actor actor, BatchPresentation batchPresentation, Set<Executor> executorsToGetTasksByMembership) {
         Executor taskExecutor = task.getExecutor();
-        ProcessDefinition processDefinition = processDefinitionLoader.getDefinition(task.getProcess());
+        ProcessDefinition processDefinition = null;
+        try {
+            processDefinition = processDefinitionLoader.getDefinition(task.getProcess());
+        } catch (DefinitionDoesNotExistException e) {
+            log.warn(String.format("getAcceptableTask: not found definition for task: %s with process: %s", task, task.getProcess()));
+            return null;
+        }
         if (executorsToGetTasksByMembership.contains(taskExecutor)) {
             log.debug(String.format("getAcceptableTask: task: %s is acquired by membership rules", task));
             return taskObjectFactory.create(task, actor, false, batchPresentation.getDynamicFieldsToDisplay(true));

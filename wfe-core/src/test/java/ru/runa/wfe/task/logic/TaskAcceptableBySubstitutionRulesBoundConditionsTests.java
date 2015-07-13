@@ -34,7 +34,7 @@ import com.google.common.collect.Maps;
 @ContextConfiguration(locations = { "classpath:ru/runa/wfe/task/logic/test.context.xml" })
 public class TaskAcceptableBySubstitutionRulesBoundConditionsTests extends AbstractTestNGSpringContextTests {
 
-    private static final Log log = LogFactory.getLog(CheckSubstitutionRulesBoundConditionsTests.class);
+    private static final Log log = LogFactory.getLog(TaskAcceptableBySubstitutionRulesBoundConditionsTests.class);
 
     @Autowired
     ITaskListBuilderTestProvider taskListBuilder;
