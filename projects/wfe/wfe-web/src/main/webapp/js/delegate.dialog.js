@@ -224,7 +224,7 @@ function delegateTaskDialog(btn) {
         var paging = searchListGroup.parent().find(".paging");
         updatePaging(paging, data.page, data.totalPages, 5, function(page) {
 				groupPage = page;
-				reloadActorList();
+                reloadGroupList();
 		});
         poppulateUL(data.data, searchListGroup, "search", "name");
     }
