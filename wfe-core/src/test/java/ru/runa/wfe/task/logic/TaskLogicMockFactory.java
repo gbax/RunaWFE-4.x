@@ -53,12 +53,12 @@ public class TaskLogicMockFactory {
 
         dataset.mockRules(batchCompilerFactory);
         dataset.mockRules(exeContextFactory);
-        dataset.mockRules(executorDAO);
         dataset.mockRules(taskDAO);
         dataset.mockRules(processDefinitionLoader);
         dataset.mockRules(logDAO);
         dataset.mockRules(substitutionLogic);
         dataset.mockRules(taskFactory);
+        dataset.mockRules(executorDAO);
     }
 
     public IWfTaskFactory createMockWfTaskFactory() {
