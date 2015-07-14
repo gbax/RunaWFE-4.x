@@ -7,17 +7,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.hibernate.Session;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import ru.runa.wfe.commons.dbpatch.DBPatch;
-import ru.runa.wfe.execution.dao.ProcessDAO;
 
 public class AddColumnsToSubstituteEscalatedTasksPatch extends DBPatch {
 
     private static final Pattern DECIMAL_LONG = Pattern.compile("([\\d]+)");
-
-    @Autowired
-    private ProcessDAO processDAO;
 
     @Override
     protected List<String> getDDLQueriesBefore() {
@@ -44,13 +39,8 @@ public class AddColumnsToSubstituteEscalatedTasksPatch extends DBPatch {
                 if (bundle[1] != null && ((m = DECIMAL_LONG.matcher((CharSequence) bundle[1])).find())) {
                     MatchResult mr = m.toMatchResult();
                     if (mr.groupCount() >= 1) {
-                        String possiblePid = mr.group(1);
                         try {
-                            Long temp = Long.parseLong(possiblePid);
-                            if (processDAO.get(temp) != null) {
-                                log.info(String.format("applyPatch: in id: %s found pid: %s by description", bundle[0], temp));
-                                pid = temp;
-                            }
+                            pid = Long.parseLong(mr.group(1));
                         } catch (Exception e) {
                             /* skip if process with pid is not found */
                         }
@@ -67,7 +57,7 @@ public class AddColumnsToSubstituteEscalatedTasksPatch extends DBPatch {
         for (Number id : ids) {
             log.info(String.format("applyPatch: id: %s set NODE_ID", id));
             try {
-                session.createSQLQuery(String.format("UPDATE EXECUTOR SET NODE_ID='' WHERE ID=%s", id)).executeUpdate();
+                session.createSQLQuery(String.format("UPDATE EXECUTOR SET NODE_ID=NULL WHERE ID=%s", id)).executeUpdate();
             } catch (Exception e) {
                 log.warn(String.format("applyPatch: set NODE_ID for id: %s exc: %s", id, e));
             }
