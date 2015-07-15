@@ -14,6 +14,7 @@ import ru.runa.wfe.task.Task;
 import ru.runa.wfe.task.cache.TaskCache;
 import ru.runa.wfe.task.dto.WfTask;
 import ru.runa.wfe.user.Actor;
+import ru.runa.wfe.user.EscalationGroup;
 import ru.runa.wfe.user.Executor;
 
 public class TaskListBuilderTestProvider extends TaskListBuilder implements ITaskListBuilderTestProvider {
@@ -52,6 +53,11 @@ public class TaskListBuilderTestProvider extends TaskListBuilder implements ITas
     public int checkSubstitutionRules(SubstitutionCriteria criteria, Set<Long> ids, ExecutionContext executionContext, Task task,
             Actor assignedActor, Actor substitutorActor) {
         return super.checkSubstitutionRules(criteria, ids, executionContext, task, assignedActor, substitutorActor);
+    }
+
+    @Override
+    public boolean isActorInInactiveEscalationGroup(Actor actor, EscalationGroup group) {
+        return super.isActorInInactiveEscalationGroup(actor, group);
     }
 
 }

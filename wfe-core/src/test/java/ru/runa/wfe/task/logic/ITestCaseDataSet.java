@@ -15,6 +15,7 @@ import ru.runa.wfe.ss.logic.ISubstitutionLogic;
 import ru.runa.wfe.task.Task;
 import ru.runa.wfe.task.dto.IWfTaskFactory;
 import ru.runa.wfe.user.Actor;
+import ru.runa.wfe.user.EscalationGroup;
 import ru.runa.wfe.user.Executor;
 import ru.runa.wfe.user.dao.IExecutorDAO;
 
@@ -53,5 +54,7 @@ public interface ITestCaseDataSet {
     public BatchPresentation getBatchPresentation();
 
     public Set<Executor> getExecutorsToGetTasksByMembership();
+
+    public EscalationGroup getEscalationGroup();
 
 }

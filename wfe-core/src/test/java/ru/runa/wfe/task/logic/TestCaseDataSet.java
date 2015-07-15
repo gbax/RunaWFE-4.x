@@ -15,6 +15,7 @@ import ru.runa.wfe.ss.logic.ISubstitutionLogic;
 import ru.runa.wfe.task.Task;
 import ru.runa.wfe.task.dto.IWfTaskFactory;
 import ru.runa.wfe.user.Actor;
+import ru.runa.wfe.user.EscalationGroup;
 import ru.runa.wfe.user.Executor;
 import ru.runa.wfe.user.dao.IExecutorDAO;
 
@@ -102,6 +103,11 @@ public abstract class TestCaseDataSet implements ITestCaseDataSet {
 
     @Override
     public Set<Executor> getExecutorsToGetTasksByMembership() {
+        return null;
+    }
+
+    @Override
+    public EscalationGroup getEscalationGroup() {
         return null;
     }
 }

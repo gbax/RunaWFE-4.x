@@ -190,17 +190,31 @@ public class TaskListBuilder implements ITaskListBuilder {
             return true;
         }
         Long pid = group.getProcessId();
-        if (pid == null || pid <= 0) {
+        String nid = group.getNodeId();
+        if (pid == null || pid <= 0 || nid == null) {
             return false;
         }
-        List<ProcessLog> pLogs = processLogDAO.getAll(group.getProcessId());
+        List<ProcessLog> pLogs = null;
+
+        try {
+            pLogs = processLogDAO.getAll(group.getProcessId());
+        } catch (DataAccessException e) {
+            log.warn(String.format("isActorInInactiveEscalationGroup: occured: %s when get logs for pid: %s", e, group.getProcessId()));
+            return false;
+        }
+
         for (ProcessLog pLog : pLogs) {
-            String nid = group.getNodeId();
-            if (!(pLog instanceof TaskEscalationLog) || nid == null || !pLog.getNodeId().equalsIgnoreCase(nid)) {
+            if (!(pLog instanceof TaskEscalationLog) || !pLog.getNodeId().equalsIgnoreCase(nid)) {
                 continue;
             }
             log.debug(String.format("isActorInInactiveEscalationGroup: escalation log was found pid: %s nid: %s", pid, nid));
-            List<Long> ids = ((ExecutorIdsValue) pLog.getPatternArguments()[1]).getIds();
+            List<Long> ids = null;
+            try {
+                ids = ((ExecutorIdsValue) pLog.getPatternArguments()[1]).getIds();
+            } catch (NullPointerException e) {
+                log.warn(String.format("isActorInInactiveEscalationGroup: occured: %s when handle log: %s", e, pLog));
+                continue;
+            }
             log.debug("isActorInInactiveEscalationGroup: escalation executors id from log :" + ids);
             if (ids.contains(actor.getId()) && (!hasActiveActorInGroup(ids))) {
                 return true;
