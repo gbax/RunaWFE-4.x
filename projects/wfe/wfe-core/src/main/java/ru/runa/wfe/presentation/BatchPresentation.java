@@ -64,7 +64,7 @@ import com.google.common.collect.Maps;
 @Table(name = "BATCH_PRESENTATION")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @XmlAccessorType(XmlAccessType.FIELD)
-public final class BatchPresentation implements Cloneable, Serializable {
+public class BatchPresentation implements Cloneable, Serializable {
     private static final long serialVersionUID = 6631653373163613071L;
     private static final Log log = LogFactory.getLog(BatchPresentation.class);
 

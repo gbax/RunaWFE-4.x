@@ -4,7 +4,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
 import java.util.Set;
 
 import ru.runa.wfe.execution.ExecutionContext;
@@ -14,6 +13,7 @@ import ru.runa.wfe.task.Task;
 import ru.runa.wfe.task.cache.TaskCache;
 import ru.runa.wfe.task.dto.WfTask;
 import ru.runa.wfe.user.Actor;
+import ru.runa.wfe.user.EscalationGroup;
 import ru.runa.wfe.user.Executor;
 
 public class TaskListBuilderTestProvider extends TaskListBuilder implements ITaskListBuilderTestProvider {
@@ -29,18 +29,8 @@ public class TaskListBuilderTestProvider extends TaskListBuilder implements ITas
     }
 
     @Override
-    public List<WfTask> getTasks(Actor actor, BatchPresentation batchPresentation) {
-        return super.getTasks(actor, batchPresentation);
-    }
-
-    @Override
     public WfTask getAcceptableTask(Task task, Actor actor, BatchPresentation batchPresentation, Set<Executor> executorsToGetTasksByMembership) {
         return super.getAcceptableTask(task, actor, batchPresentation, executorsToGetTasksByMembership);
-    }
-
-    @Override
-    public Set<Executor> getExecutorsToGetTasks(Actor actor, boolean addOnlyInactiveGroups) {
-        return super.getExecutorsToGetTasks(actor, addOnlyInactiveGroups);
     }
 
     @Override
@@ -52,6 +42,11 @@ public class TaskListBuilderTestProvider extends TaskListBuilder implements ITas
     public int checkSubstitutionRules(SubstitutionCriteria criteria, Set<Long> ids, ExecutionContext executionContext, Task task,
             Actor assignedActor, Actor substitutorActor) {
         return super.checkSubstitutionRules(criteria, ids, executionContext, task, assignedActor, substitutorActor);
+    }
+
+    @Override
+    public boolean isActorInInactiveEscalationGroup(Actor actor, EscalationGroup group) {
+        return super.isActorInInactiveEscalationGroup(actor, group);
     }
 
 }

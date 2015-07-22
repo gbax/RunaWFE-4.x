@@ -42,7 +42,7 @@ import com.google.common.collect.Lists;
  * @since 4.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public final class WfTask implements Serializable {
+public class WfTask implements Serializable {
     private static final long serialVersionUID = 3415182898189086844L;
 
     private Long id;
@@ -64,7 +64,7 @@ public final class WfTask implements Serializable {
     private boolean acquiredBySubstitution;
 
     // map is not usable in web services
-    private List<WfVariable> variables = Lists.newArrayList();
+    private final List<WfVariable> variables = Lists.newArrayList();
 
     public WfTask() {
     }

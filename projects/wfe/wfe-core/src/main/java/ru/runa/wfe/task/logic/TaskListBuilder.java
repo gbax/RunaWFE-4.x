@@ -9,12 +9,14 @@ import java.util.TreeMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 
 import ru.runa.wfe.audit.ProcessLog;
 import ru.runa.wfe.audit.TaskEscalationLog;
 import ru.runa.wfe.audit.dao.IProcessLogDAO;
 import ru.runa.wfe.audit.presentation.ExecutorIdsValue;
 import ru.runa.wfe.commons.dao.IGenericDAO;
+import ru.runa.wfe.definition.DefinitionDoesNotExistException;
 import ru.runa.wfe.definition.dao.IProcessDefinitionLoader;
 import ru.runa.wfe.execution.ExecutionContext;
 import ru.runa.wfe.execution.IExecutorContextFactory;
@@ -32,6 +34,7 @@ import ru.runa.wfe.task.dto.WfTask;
 import ru.runa.wfe.user.Actor;
 import ru.runa.wfe.user.EscalationGroup;
 import ru.runa.wfe.user.Executor;
+import ru.runa.wfe.user.ExecutorDoesNotExistException;
 import ru.runa.wfe.user.Group;
 import ru.runa.wfe.user.dao.IExecutorDAO;
 
@@ -110,7 +113,13 @@ public class TaskListBuilder implements ITaskListBuilder {
 
     protected WfTask getAcceptableTask(Task task, Actor actor, BatchPresentation batchPresentation, Set<Executor> executorsToGetTasksByMembership) {
         Executor taskExecutor = task.getExecutor();
-        ProcessDefinition processDefinition = processDefinitionLoader.getDefinition(task.getProcess());
+        ProcessDefinition processDefinition = null;
+        try {
+            processDefinition = processDefinitionLoader.getDefinition(task.getProcess());
+        } catch (DefinitionDoesNotExistException e) {
+            log.warn(String.format("getAcceptableTask: not found definition for task: %s with process: %s", task, task.getProcess()));
+            return null;
+        }
         if (executorsToGetTasksByMembership.contains(taskExecutor)) {
             log.debug(String.format("getAcceptableTask: task: %s is acquired by membership rules", task));
             return taskObjectFactory.create(task, actor, false, batchPresentation.getDynamicFieldsToDisplay(true));
@@ -157,8 +166,7 @@ public class TaskListBuilder implements ITaskListBuilder {
         Set<Group> upperGroups = executorDAO.getExecutorParentsAll(actor);
         if (addOnlyInactiveGroups) {
             for (Group group : upperGroups) {
-                if ((group instanceof EscalationGroup)
-                    && (isActorInInactiveEscalationGroup(actor, (EscalationGroup)group))){
+                if ((group instanceof EscalationGroup) && (isActorInInactiveEscalationGroup(actor, (EscalationGroup) group))) {
                     executors.add(group);
                 } else {
                     if (!hasActiveActorInGroup(group)) {
@@ -173,25 +181,43 @@ public class TaskListBuilder implements ITaskListBuilder {
     }
 
     protected boolean isActorInInactiveEscalationGroup(Actor actor, EscalationGroup group) {
-        EscalationGroup currGroup = (EscalationGroup) group;
-        Executor originalExecutor = currGroup.getOriginalExecutor();
-        if ((originalExecutor instanceof Actor) && originalExecutor.getId().equals(actor.getId())
-                && (!((Actor) originalExecutor).isActive())) {
+        Executor originalExecutor = group.getOriginalExecutor();
+        if ((originalExecutor instanceof Actor) && originalExecutor.getId().equals(actor.getId()) && (!((Actor) originalExecutor).isActive())) {
             return true;
         }
         if ((originalExecutor instanceof Group) && executorDAO.getGroupActors((Group) originalExecutor).contains(actor)
                 && (!hasActiveActorInGroup((Group) originalExecutor))) {
             return true;
         }
-        List<ProcessLog> pLogs = processLogDAO.getAll(currGroup.getProcessId());
+        Long pid = group.getProcessId();
+        String nid = group.getNodeId();
+        if (pid == null || pid <= 0 || nid == null) {
+            return false;
+        }
+        List<ProcessLog> pLogs = null;
+
+        try {
+            pLogs = processLogDAO.getAll(group.getProcessId());
+        } catch (DataAccessException e) {
+            log.warn(String.format("isActorInInactiveEscalationGroup: occured: %s when get logs for pid: %s", e, group.getProcessId()));
+            return false;
+        }
+
         for (ProcessLog pLog : pLogs) {
-            if (pLog instanceof TaskEscalationLog && pLog.getNodeId().equalsIgnoreCase(currGroup.getNodeId())) {
-                log.debug("getExecutorsToGetTasks: Escalation log was found.");
-                List<Long> ids = ((ExecutorIdsValue) pLog.getPatternArguments()[1]).getIds();
-                log.debug("getExecutorsToGetTasks: Escalation executors id from log :" + ids);
-                if (ids.contains(actor.getId()) && (!hasActiveActorInGroup(ids))) {
-                    return true;
-                }
+            if (!(pLog instanceof TaskEscalationLog) || !pLog.getNodeId().equalsIgnoreCase(nid)) {
+                continue;
+            }
+            log.debug(String.format("isActorInInactiveEscalationGroup: escalation log was found pid: %s nid: %s", pid, nid));
+            List<Long> ids = null;
+            try {
+                ids = ((ExecutorIdsValue) pLog.getPatternArguments()[1]).getIds();
+            } catch (NullPointerException e) {
+                log.warn(String.format("isActorInInactiveEscalationGroup: occured: %s when handle log: %s", e, pLog));
+                continue;
+            }
+            log.debug("isActorInInactiveEscalationGroup: escalation executors id from log :" + ids);
+            if (ids.contains(actor.getId()) && (!hasActiveActorInGroup(ids))) {
+                return true;
             }
         }
         return false;
@@ -225,7 +251,16 @@ public class TaskListBuilder implements ITaskListBuilder {
             Actor assignedActor, Actor substitutorActor) {
         int result = 0;
         for (Long actorId : ids) {
-            Actor actor = executorDAO.getActor(actorId);
+            Actor actor;
+            try {
+                actor = executorDAO.getActor(actorId);
+            } catch (DataAccessException e) {
+                log.warn(String.format("checkSubstitutionCriteriaRules: exception: %s on DAO-access with actorId: %s", e, actorId));
+                continue;
+            } catch (ExecutorDoesNotExistException e) {
+                log.warn(String.format("checkSubstitutionCriteriaRules: exception: %s on DAO-access with actorId: %s", e, actorId));
+                continue;
+            }
             if (actor.isActive() && criteriaIsSatisfied(criteria, executionContext, task, assignedActor, actor)) {
                 log.debug(String.format("checkSubstitutionCriteriaRules: to task: %s is applied %s", task, criteria));
                 result |= SUBSTITUTION_APPLIES;
