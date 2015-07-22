@@ -48,7 +48,7 @@ import com.google.common.collect.Sets;
  * @author Semochkin_v
  * @author Gordienko_m
  */
-public class SubstitutionLogic extends CommonLogic {
+public class SubstitutionLogic extends CommonLogic implements ISubstitutionLogic {
     private static final Log log = LogFactory.getLog(SubstitutionLogic.class);
     private final SubstitutionCache substitutionCache = SubstitutionCacheCtrl.getInstance();
     @Autowired
@@ -89,12 +89,14 @@ public class SubstitutionLogic extends CommonLogic {
         substitutionDAO.flushPendingChanges();
     }
 
+    @Override
     public List<Substitution> getSubstitutions(User user, Long actorId) {
         Actor actor = executorDAO.getActor(actorId);
         checkPermissionsOnExecutor(user, actor, Permission.READ);
         return substitutionDAO.getByActorId(actorId, true);
     }
 
+    @Override
     public Substitution getSubstitution(User user, Long id) {
         return substitutionDAO.getNotNull(id);
     }
@@ -205,10 +207,12 @@ public class SubstitutionLogic extends CommonLogic {
         fixPositionsForDeletedSubstitution(substitution.getActorId());
     }
 
+    @Override
     public TreeMap<Substitution, Set<Long>> getSubstitutors(Actor actor) {
         return substitutionCache.getSubstitutors(actor, true);
     }
 
+    @Override
     public Set<Long> getSubstituted(Actor actor) {
         return substitutionCache.getSubstituted(actor);
     }
@@ -217,14 +221,17 @@ public class SubstitutionLogic extends CommonLogic {
         substitutionCriteriaDAO.create(criteria);
     }
 
+    @Override
     public SubstitutionCriteria getCriteria(User user, Long id) {
         return substitutionCriteriaDAO.getNotNull(id);
     }
 
+    @Override
     public SubstitutionCriteria getCriteria(User user, String name) {
         return substitutionCriteriaDAO.getByName(name);
     }
 
+    @Override
     public List<SubstitutionCriteria> getAllCriterias(User user) {
         return substitutionCriteriaDAO.getAll();
     }
@@ -243,6 +250,7 @@ public class SubstitutionLogic extends CommonLogic {
         substitutionCriteriaDAO.delete(criteria);
     }
 
+    @Override
     public List<Substitution> getSubstitutionsByCriteria(User user, SubstitutionCriteria criteria) {
         return substitutionCriteriaDAO.getSubstitutionsByCriteria(criteria);
     }
