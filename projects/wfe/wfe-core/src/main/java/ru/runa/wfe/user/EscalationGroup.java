@@ -33,6 +33,7 @@ public class EscalationGroup extends TemporaryGroup {
     private Executor originalExecutor;
     private int level;
 
+    private long processId;
     private String nodeId;
 
     @ManyToOne(targetEntity = Executor.class, fetch = FetchType.EAGER)
@@ -53,6 +54,15 @@ public class EscalationGroup extends TemporaryGroup {
 
     public void setLevel(int escalationLevel) {
         level = escalationLevel;
+    }
+
+    @Column(name = "PROCESS_ID")
+    public long getProcessId() {
+        return processId;
+    }
+
+    public void setProcessId(long processId) {
+        this.processId = processId;
     }
 
     @Column(name = "NODE_ID")
