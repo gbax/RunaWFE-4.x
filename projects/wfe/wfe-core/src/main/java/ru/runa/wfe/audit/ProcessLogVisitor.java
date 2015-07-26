@@ -32,6 +32,8 @@ public interface ProcessLogVisitor {
 
     void onTaskEscalationLog(TaskEscalationLog taskEscalationLog);
 
+    void onTaskDelegaionLog(TaskDelegationLog taskDelegationLog);
+
     void onTaskRemovedOnProcessEndLog(TaskRemovedOnProcessEndLog taskRemovedOnProcessEndLog);
 
     void onTaskExpiredLog(TaskExpiredLog taskExpiredLog);

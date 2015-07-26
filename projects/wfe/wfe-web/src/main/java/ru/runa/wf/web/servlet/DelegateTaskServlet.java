@@ -2,6 +2,7 @@ package ru.runa.wf.web.servlet;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -25,7 +26,6 @@ import ru.runa.wfe.user.Group;
 import ru.runa.wfe.user.TemporaryGroup;
 import ru.runa.wfe.user.User;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class DelegateTaskServlet extends HttpServlet {
@@ -70,7 +70,6 @@ public class DelegateTaskServlet extends HttpServlet {
 
         WfTask task = Delegates.getExecutionService().getTask(user, taskId);
         Executor currentOwner = task.getOwner();
-        Executor newOwner;
 
         if (keepCurrent) {
             if (currentOwner instanceof Group && currentOwner.getName().startsWith(TemporaryGroup.GROUP_PREFIX)) {
@@ -83,21 +82,12 @@ public class DelegateTaskServlet extends HttpServlet {
             }
         }
 
-        if (executors.size() == 1) {
-            // single executor
-            Long executorId = executors.iterator().next();
-            newOwner = Delegates.getExecutorService().getExecutor(user, executorId);
-        } else {
-            // temporary group
-            String groupName = "delegateTaskGroup_" + user.getActor().getId().toString() + "_" + currentOwner.getId().toString() + "_"
-                    + taskId.toString();
-            TemporaryGroup tempGroup = TemporaryGroup.create(groupName, "Autocreated by delegate task servlet");
-            tempGroup = Delegates.getExecutorService().create(user, tempGroup);
-            List<Long> executorIdList = Lists.newArrayList(executors);
-            Delegates.getExecutorService().addExecutorsToGroup(user, executorIdList, tempGroup.getId());
-            newOwner = tempGroup;
+        List<Executor> executorList = new ArrayList<Executor>();
+        for (Long executorId : executors) {
+            Executor newOwner = Delegates.getExecutorService().getExecutor(user, executorId);
+            executorList.add(newOwner);
         }
-        Delegates.getExecutionService().assignTask(user, taskId, currentOwner, newOwner);
+        Delegates.getExecutionService().delegateTask(user, taskId, currentOwner, executorList);
     }
 
 }

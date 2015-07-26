@@ -310,6 +310,12 @@ public class ExecutionServiceBean implements ExecutionServiceLocal, ExecutionSer
     }
 
     @Override
+    public void delegateTask(User user, Long taskId, Executor currentOwner, List<Executor> newOwners) {
+        Preconditions.checkArgument(user != null);
+        taskLogic.delegateTask(user, taskId, currentOwner, newOwners);
+    }
+
+    @Override
     @WebResult(name = "result")
     public Variable getVariableWS(@WebParam(name = "user") User user, @WebParam(name = "processId") Long processId,
             @WebParam(name = "variableName") String variableName) {

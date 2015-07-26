@@ -30,6 +30,7 @@ import ru.runa.wfe.audit.TransitionLog;
 import ru.runa.wfe.audit.VariableCreateLog;
 import ru.runa.wfe.audit.VariableDeleteLog;
 import ru.runa.wfe.audit.VariableUpdateLog;
+import ru.runa.wfe.audit.TaskDelegationLog;
 import ru.runa.wfe.audit.aggregated.ProcessInstanceAggregatedLog;
 import ru.runa.wfe.audit.aggregated.TaskAggregatedLog;
 import ru.runa.wfe.audit.aggregated.TaskAggregatedLog.EndReason;
@@ -137,6 +138,10 @@ public class UpdateAggregatedLogOperation implements ProcessLogVisitor {
 
     @Override
     public void onTaskEscalationLog(TaskEscalationLog taskEscalationLog) {
+    }
+
+    @Override
+    public void onTaskDelegaionLog(TaskDelegationLog taskDelegationLog) {
     }
 
     @Override

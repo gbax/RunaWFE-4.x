@@ -272,4 +272,13 @@ public class ExecutionServiceDelegate extends EJB3Delegate implements ExecutionS
         }
     }
 
+    @Override
+    public void delegateTask(User user, Long taskId, Executor currentOwner, List<Executor> newOwners) {
+        try {
+            getExecutionService().delegateTask(user, taskId, currentOwner, newOwners);
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
 }

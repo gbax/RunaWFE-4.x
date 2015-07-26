@@ -40,7 +40,7 @@ import ru.runa.wfe.var.file.FileVariable;
 
 /**
  * Process execution service.
- * 
+ *
  * @author Dofs
  * @since 4.0
  */
@@ -48,7 +48,7 @@ public interface ExecutionService {
 
     /**
      * Starts new process by definition.
-     * 
+     *
      * @param user
      *            authorized user
      * @param definitionName
@@ -64,7 +64,7 @@ public interface ExecutionService {
 
     /**
      * Gets process count for {@link BatchPresentation}.
-     * 
+     *
      * @param user
      *            authorized user
      * @param batchPresentation
@@ -74,7 +74,7 @@ public interface ExecutionService {
 
     /**
      * Gets processes for {@link BatchPresentation}.
-     * 
+     *
      * @param user
      *            authorized user
      * @param batchPresentation
@@ -84,7 +84,7 @@ public interface ExecutionService {
 
     /**
      * Gets processes for {@link ProcessFilter}.
-     * 
+     *
      * @param user
      *            authorized user
      * @param filter
@@ -95,7 +95,7 @@ public interface ExecutionService {
 
     /**
      * Gets process by id.
-     * 
+     *
      * @param user
      *            authorized user
      * @param processId
@@ -107,7 +107,7 @@ public interface ExecutionService {
 
     /**
      * Gets parent process if this process will be started as subprocess.
-     * 
+     *
      * @param user
      *            authorized user
      * @param processId
@@ -119,7 +119,7 @@ public interface ExecutionService {
 
     /**
      * Get all subprocesses (recursively) by process id.
-     * 
+     *
      * @param user
      *            authorized user
      * @param processId
@@ -133,7 +133,7 @@ public interface ExecutionService {
 
     /**
      * Cancels process by id.
-     * 
+     *
      * @param user
      *            authorized user
      * @param processId
@@ -144,7 +144,7 @@ public interface ExecutionService {
 
     /**
      * Gets tasks by {@link BatchPresentation}.
-     * 
+     *
      * @param user
      *            authorized user
      * @param batchPresentation
@@ -154,7 +154,7 @@ public interface ExecutionService {
 
     /**
      * Gets task by id.
-     * 
+     *
      * @param user
      *            authorized user
      * @param taskId
@@ -166,7 +166,7 @@ public interface ExecutionService {
 
     /**
      * Gets all process tasks.
-     * 
+     *
      * @param user
      *            authorized user
      * @param processId
@@ -178,7 +178,7 @@ public interface ExecutionService {
 
     /**
      * Reassigns task to another executor.
-     * 
+     *
      * @param previousOwner
      *            old executor (check for multi-threaded change)
      * @param newOwner
@@ -190,7 +190,7 @@ public interface ExecutionService {
 
     /**
      * Completes task by id.
-     * 
+     *
      * @param user
      *            authorized user
      * @param taskId
@@ -209,7 +209,7 @@ public interface ExecutionService {
 
     /**
      * Gets all initialized process roles.
-     * 
+     *
      * @param user
      *            authorized user
      * @param processId
@@ -221,7 +221,7 @@ public interface ExecutionService {
 
     /**
      * Assigns role by name to specified executor.
-     * 
+     *
      * @param user
      *            authorized user
      * @param processId
@@ -236,7 +236,7 @@ public interface ExecutionService {
 
     /**
      * Gets all process variables.
-     * 
+     *
      * @param user
      *            authorized user
      * @param processId
@@ -248,7 +248,7 @@ public interface ExecutionService {
 
     /**
      * Gets variable by name from process.
-     * 
+     *
      * @param user
      *            authorized user
      * @param processId
@@ -262,7 +262,7 @@ public interface ExecutionService {
 
     /**
      * Gets file variable value by name from process.
-     * 
+     *
      * @param user
      *            authorized user
      * @param processId
@@ -276,7 +276,7 @@ public interface ExecutionService {
 
     /**
      * Updates process variables without any signalling.
-     * 
+     *
      * @param user
      *            authorized user
      * @param processId
@@ -289,7 +289,7 @@ public interface ExecutionService {
 
     /**
      * Gets process diagram as PNG image.
-     * 
+     *
      * @param user
      *            authorized user
      * @param processId
@@ -308,7 +308,7 @@ public interface ExecutionService {
 
     /**
      * Gets process graph elements for diagram.
-     * 
+     *
      * @param user
      *            authorized user
      * @param processId
@@ -323,7 +323,7 @@ public interface ExecutionService {
 
     /**
      * Marks task as read.
-     * 
+     *
      * @param user
      *            authorized user
      * @param taskId
@@ -347,4 +347,17 @@ public interface ExecutionService {
      * not safe operation, use it with caution.
      */
     public void upgradeProcessToNextDefinitionVersion(User user, Long processId);
+
+    /**
+     * Delegate task to another users or groups.
+     * @param user
+     *          authorized user
+     * @param taskId
+     *          task id
+     * @param currentOwner
+     *         current executor
+     * @param newOwners
+     *         new executor list
+     */
+    public void delegateTask(User user, Long taskId, Executor currentOwner, List<Executor> newOwners);
 }

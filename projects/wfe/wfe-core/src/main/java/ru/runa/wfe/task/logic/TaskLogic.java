@@ -1,11 +1,13 @@
 package ru.runa.wfe.task.logic;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import ru.runa.wfe.InternalApplicationException;
+import ru.runa.wfe.audit.TaskDelegationLog;
 import ru.runa.wfe.commons.SystemProperties;
 import ru.runa.wfe.commons.logic.WFCommonLogic;
 import ru.runa.wfe.execution.ExecutionContext;
@@ -25,6 +27,7 @@ import ru.runa.wfe.lang.SwimlaneDefinition;
 import ru.runa.wfe.lang.Synchronizable;
 import ru.runa.wfe.lang.Transition;
 import ru.runa.wfe.presentation.BatchPresentation;
+import ru.runa.wfe.security.Permission;
 import ru.runa.wfe.task.Task;
 import ru.runa.wfe.task.TaskAlreadyAcceptedException;
 import ru.runa.wfe.task.TaskCompletionBy;
@@ -35,6 +38,8 @@ import ru.runa.wfe.task.dto.WfTaskFactory;
 import ru.runa.wfe.user.Actor;
 import ru.runa.wfe.user.Executor;
 import ru.runa.wfe.user.ExecutorPermission;
+import ru.runa.wfe.user.DelegationGroup;
+import ru.runa.wfe.user.GroupPermission;
 import ru.runa.wfe.user.User;
 import ru.runa.wfe.validation.ValidationException;
 import ru.runa.wfe.var.IVariableProvider;
@@ -193,6 +198,31 @@ public class TaskLogic extends WFCommonLogic {
         }
         ProcessDefinition processDefinition = getDefinition(task);
         AssignmentHelper.reassignTask(new ExecutionContext(processDefinition, task), task, newExecutor, false);
+    }
+
+    public void delegateTask(User user, Long taskId, Executor currentOwner, List<Executor> newOwners) throws TaskAlreadyAcceptedException {
+        Task task = taskDAO.getNotNull(taskId);
+        final Process process = task.getProcess();
+        final DelegationGroup delegationGroup = DelegationGroup.create(process.getId(), taskId, user, currentOwner);
+        List<Permission> selfPermissions = Lists.newArrayList(Permission.READ, GroupPermission.LIST_GROUP);
+        executorDAO.create(delegationGroup);
+        Collection<Permission> p = delegationGroup.getSecuredObjectType().getNoPermission().getAllPermissions();
+        permissionDAO.setPermissions(user.getActor(), p, delegationGroup);
+        permissionDAO.setPermissions(delegationGroup, selfPermissions, delegationGroup);
+        checkPermissionsOnExecutors(user, newOwners, Permission.READ);
+        checkPermissionsOnExecutor(user, delegationGroup, GroupPermission.ADD_TO_GROUP);
+        executorDAO.addExecutorsToGroup(newOwners, delegationGroup);
+        // check assigned executor for the task
+        if (!Objects.equal(currentOwner, task.getExecutor())) {
+            throw new TaskAlreadyAcceptedException(task.getName());
+        }
+        if (SystemProperties.isTaskAssignmentStrictRulesEnabled()) {
+            checkCanParticipate(user.getActor(), task);
+        }
+        ProcessDefinition processDefinition = getDefinition(task);
+        final ExecutionContext executionContext = new ExecutionContext(processDefinition, task);
+        executionContext.addLog(new TaskDelegationLog(task, newOwners));
+        AssignmentHelper.reassignTask(executionContext, task, delegationGroup, false);
     }
 
 }
